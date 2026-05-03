@@ -1,0 +1,259 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+
+
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+\begin{center}
+    \textbf{\Large Research Proposal}
+\end{center}
+
+\vspace{0.5cm}
+
+\noindent \textbf{Samantha Irving} \\
+\noindent \textbf{samantha.irving@stud.unilu.ch} \\
+
+\noindent \textbf{Date:} 01.05.2026
+
+\vspace{0.5cm}
+
+% ============================================================
+\noindent \textbf{Preliminary title:} \\
+Coercion and Vulnerability: A District-Level Analysis of Rwanda’s Crop Intensification Program (CIP) and smallholder resilience to climatic shocks.
+
+\vspace{0.5cm}
+
+% ============================================================
+\noindent \textbf{Preliminary research question:} \\
+Does higher district-level land use consolidation intensity under Rwanda's
+Crop Intensification Program correlate with greater household food
+insecurity during climatic shocks?
+
+\textit{food insecurity/regional welfare... need to figure out what to use for 'social resilience'..
+inhibiting sovereignty over land use, decreasing livelihood flexibility, and constricting resource access. - (clay et al)
+}
+
+\vspace{0.3cm}
+
+\noindent \textbf{[Subquestions]}
+\begin{itemize}[noitemsep]
+    \item Is the share of plots under land use consolidation (LUC) per
+          district negatively associated with household dietary diversity
+          scores when interacted with below-average seasonal rainfall?
+    \item Does the negative interaction between LUC intensity and rainfall
+          shocks increase monotonically as household wealth decreases,
+          indicating that the poorest households bear the greatest
+          resilience cost?
+    \item \textit{Correlation with lower emissions?}
+\end{itemize}
+
+\vspace{0.5cm}
+
+% ============================================================
+\noindent \textbf{Preliminary knowledge:} \\
+
+\noindent \textit{Puzzle and relevance.}
+Rwanda's Crop Intensification Program (CIP), launched in 2007, is one of
+the most coercively enforced agricultural transformation programmes in
+sub-Saharan Africa. Under the programme's land use consolidation (LUC)
+component, farmers were mandated to cultivate state-assigned monocrops on
+consolidated plots, with compliance enforced through Rwanda's
+\textit{imihigo} performance contract system---a cascade of accountability
+running from the president through ministers and mayors down to individual
+farmers (Cioffo et al., 2016). The programme produced nationally reported
+yield increases for priority crops and is widely cited as a demonstration
+of what strong state capacity can achieve in agricultural development
+(Cantore, 2011).
+
+\vspace{0.3cm}
+\noindent Yet this aggregate productivity narrative conceals a distributional
+question: \textit{who paid the price for these gains?} Del~Prete et al.\
+(2019), using Rwanda's Integrated Household Living Conditions Survey
+(EICV), find that land consolidation increased production of roots and
+tubers while reducing dietary diversity---specifically decreasing
+consumption of meat, fish, fruits, and micronutrient-rich foods. Clay and
+Zimmerer (2020) go further, arguing through multi-season fieldwork that
+the CIP reduced smallholder \textit{resilience} by stripping farmers of
+the crop diversity, livelihood flexibility, and resource access that
+previously buffered them against climatic variability. Their
+claim---that CIP households are more exposed to food insecurity when
+rainfall fails---has not been tested quantitatively. This study addresses
+that gap.
+
+\vspace{0.3cm}
+\noindent \textit{Theoretical approach.}
+The core argument is that Rwanda's \textit{imihigo} enforcement machinery
+enabled the state to impose a macro-level productivity goal by removing
+the micro-level adaptive strategies smallholders use to manage risk. In a
+democratic context, affected households could resist mandated monocropping
+through political voice or exit; Rwanda's enforcement cascade foreclosed
+both options. The result is a structural vulnerability: CIP households are
+locked into state-assigned crops with reduced ability to shift cultivation
+in response to adverse weather---a cost that falls hardest on those with
+the fewest alternative resources.
+
+\vspace{0.3cm}
+\noindent \textit{Hypotheses.}
+\begin{itemize}[noitemsep]
+    \item[\textbf{H1}] Households in districts with higher LUC intensity
+          will show lower dietary diversity scores during years of
+          below-average rainfall than households in low-intensity
+          districts (\textit{resilience-reducing effect of CIP}).
+
+    \item[\textbf{H2}] The vulnerability-amplifying effect of LUC
+          intensity will increase as household wealth decreases
+          (\textit{poverty-concentration hypothesis}).
+\end{itemize}
+
+\vspace{0.3cm}
+\noindent \textit{Operationalization.}
+The key independent variable is \textbf{district-level LUC intensity},
+defined as the share of sampled agricultural plots recorded as located
+within an official land consolidation site in a given season. This is
+constructed from variable \texttt{s2q12} (``Is this plot located in a land
+consolidation site?'') in the NISR Seasonal Agricultural Survey (SAS)
+plot-level microdata, aggregated to the district level. The primary
+dependent variable is \textbf{household dietary diversity score (DDS)},
+constructed from the food consumption module of the EICV household survey.
+The \textbf{climatic shock variable} is the standardised seasonal rainfall
+anomaly per district, derived from CHIRPS v2.0 gridded precipitation data
+aggregated to district polygons. The key estimating quantity is the
+interaction between LUC intensity and rainfall anomaly.  The unit of
+analysis is the \textbf{household}, nested within districts
+($N \approx 14{,}000$ households across 30 districts).
+
+\vspace{0.5cm}
+
+% ============================================================
+\noindent \textbf{Preliminary structure:}
+\begin{enumerate}[noitemsep]
+    \item Introduction
+    \item Overview of the relevant literature (focus on Clay \& Zimmerer,
+          2020; Del~Prete et al., 2019)
+    \item Theory and hypotheses: The Trade-off between Specialisation and
+          Resilience
+    \item Empirics
+    \begin{enumerate}[label=4.\arabic*, noitemsep]
+        \item Research design and operationalization
+        \item Methodology
+        \item Results
+    \end{enumerate}
+    \item Conclusion
+\end{enumerate}
+
+\vspace{0.5cm}
+
+% ============================================================
+\noindent \textbf{Methodology note:} \\
+The study employs OLS regression with district fixed effects, estimated on
+a cross-sectional household sample from the EICV4 (2013/14) or EICV5
+(2016/17) survey---the waves covering the period of mature CIP
+implementation. The district-level LUC intensity variable is merged to the
+household data via the common district identifier. The baseline model is:
+
+\vspace{0.3cm}
+\begin{equation}
+\text{DDS}_{ihd} = \beta_1\,\text{LUC}_{d}
++ \beta_2\,\text{Rain}_{d}
++ \beta_3\bigl(\text{LUC}_{d} \times \text{Rain}_{d}\bigr)
++ \mathbf{Z}_{ih}'\boldsymbol{\gamma}
++ \alpha_{d}
++ \varepsilon_{ihd}
+\end{equation}
+
+\noindent where $\text{DDS}_{ihd}$ is the dietary diversity score for
+household $h$ in district $d$; $\text{LUC}_{d}$ is the district share of
+plots under land consolidation; $\text{Rain}_{d}$ is the standardised
+rainfall anomaly; $\beta_3$ is the key coefficient (a negative value
+supports H1); $\mathbf{Z}_{ih}$ is a vector of household-level controls
+(land area, market distance, household size, asset index); $\alpha_{d}$
+are district fixed effects; and $\varepsilon_{ihd}$ is the error term
+clustered at the district level. To test H2 and H3, the model is extended
+with a triple interaction term $\text{LUC}_{d} \times \text{Rain}_{d}
+\times M_{ih}$, where $M_{ih}$ is female household headship or wealth
+quintile. Propensity score matching (PSM) is used as a robustness check.
+
+\vspace{0.5cm}
+
+% ============================================================
+\noindent \textbf{Data sources:}
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tabular}{>{\bfseries}p{3.6cm} p{5.0cm} p{4.6cm}}
+\toprule
+Variable & Source & Access \\
+\midrule
+Dietary diversity score (DV) &
+    EICV4 (2013/14) or EICV5 (2016/17) &
+    World Bank Microdata Catalog; free registration \\[4pt]
+LUC intensity (\% plots; \texttt{s2q12}) &
+    NISR Seasonal Agricultural Survey microdata &
+    IHSN catalog / NISR microdata catalog; free registration \\[4pt]
+Seasonal rainfall anomaly &
+    CHIRPS v2.0 gridded precipitation &
+    data.chc.ucsb.edu; direct download, no registration \\[4pt]
+District merge key &
+    Common to EICV and SAS &
+    Included in both datasets \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.3cm}
+\noindent \textit{Data construction note.} The LUC intensity variable is
+constructed in two steps: (1) download the NISR SAS plot-level microdata
+and extract variable \texttt{s2q12}; (2) collapse to district level to
+obtain the share of plots under LUC per district per season. This measure
+is merged to the EICV household data via the district code. CHIRPS raster
+files are aggregated to Rwanda's 30 district polygons and the seasonal
+anomaly is computed as the standardised deviation from the 1981--2010
+district mean.
+
+\vspace{0.5cm}
+
+% ============================================================
+\noindent \textbf{Literature:} \\
+
+\noindent Bizoza, Alfred Runezerwa. 2021. ``Systematic Review of the
+Effectiveness of Land Use Consolidation in Rwanda.'' \textit{Land Use
+Policy} 101: 105140.
+
+\noindent Cantore, Nicola. 2011. \textit{The Crop Intensification Program
+in Rwanda: A Sustainability Analysis}. London: Overseas Development
+Institute.
+
+\noindent Cioffo, Giuseppe, An Ansoms, and Jude Murison. 2016.
+``Modernising Agriculture through a `New' Green Revolution: The Limits of
+the Crop Intensification Programme in Rwanda.'' \textit{Review of African
+Political Economy} 43(148): 188--204.
+
+\noindent Clay, Nathan, and Karl Zimmerer. 2020. ``Who Is Resilient in
+Africa's Green Revolution? Sustainable Intensification and Food Security
+in Rwanda.'' \textit{Food Policy} 97: 101936.
+
+\noindent Del~Prete, Davide, Ambra Seck, and Mattia Bertazzini. 2019.
+``The Short-Term Impact of Rwanda's Land Use Consolidation Programme on
+Household Diets.'' \textit{Food Policy} 83: 165--177.
+
+\noindent National Institute of Statistics of Rwanda (NISR). Various
+years. \textit{Seasonal Agricultural Survey Microdata}. Kigali: NISR.
+Available at: \texttt{microdata.statistics.gov.rw}.
+
+\noindent National Institute of Statistics of Rwanda (NISR). 2014 and
+2017. \textit{Integrated Household Living Conditions Survey, Waves 4 and
+5}. Kigali: NISR. Available via World Bank Microdata Catalog:
+\texttt{microdata.worldbank.org}.
+
+\end{document}
