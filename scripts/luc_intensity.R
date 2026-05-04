@@ -21,7 +21,7 @@ dist_cip_summary <- sas_data %>%
   group_by(s1q2) %>% # Group by District
   summarise(
     total_ha = sum(Plot_size_ha, na.rm = TRUE),
-    luc_ha = sum(Plot_size_ha[s2q14 == 1], na.rm = TRUE), # Sum area where s2q14 is 'Yes'
+    luc_ha = sum(Plot_size_ha[s2q12 == 1], na.rm = TRUE), # Sum area where s2q12 is 'Yes'
     cip_intensity = (luc_ha / total_ha) * 100
   )
 
@@ -39,9 +39,9 @@ rwa_map <- gadm(country = "RWA", level = 2, path = tempdir()) %>% st_as_sf()
 # ======================= WITH ALL 3 SEASONS =========================
 
 # Load all three 
-sas_a <- read_dta("data/SAS 2025/Season A/Rwa_raw_SeasonA2025_Screening.dta")
-sas_b <- read_dta("data/SAS 2025/Season B/Rwa_raw_SeasonB2025_Screening.dta")
-sas_c <- read_dta("data/SAS 2025/Season C/Rwa_raw_SeasonC2025_Screening.dta")
+sas_a <- read_dta("data/SAS 2024/Season A/Rwa_raw_SeasonA2024_Screening.dta")
+sas_b <- read_dta("data/SAS 2024/Season B/Rwa_raw_SeasonB2024_Screening.dta")
+sas_c <- read_dta("data/SAS 2024/Season C/Rwa_raw_SeasonC2024_Screening.dta")
 
 # Add a season indicator to each 
 sas_a$season <- "A"
@@ -56,7 +56,7 @@ dist_annual_summary <- sas_annual %>%
   group_by(s1q2) %>% 
   summarise(
     total_ha = sum(Plot_size_ha, na.rm = TRUE),
-    luc_ha = sum(Plot_size_ha[s2q14 == 1], na.rm = TRUE), 
+    luc_ha = sum(Plot_size_ha[s2q12 == 1], na.rm = TRUE), 
     cip_intensity = (luc_ha / total_ha) * 100
   ) %>%
   mutate(s1q2 = as.character(s1q2))
@@ -70,9 +70,9 @@ ggplot(data = map_data_annual) +
   geom_sf(aes(fill = cip_intensity), color = "white", size = 0.1) +
   scale_fill_viridis_c(option = "mako", name = "Annual % Land in LUC") +
   labs(
-    title = "Annual CIP Intensity: Land Use Consolidation (2025)",
+    title = "Annual CIP Intensity: Land Use Consolidation (2024)",
     subtitle = "Combined Data from Seasons A, B, and C",
-    caption = "Source: SAS 2025 Plot-Level Microdata"
+    caption = "Source: SAS 2024 Plot-Level Microdata"
   ) +
   theme_minimal() +
   theme(axis.text = element_blank(), panel.grid = element_blank())
@@ -90,8 +90,8 @@ process_sas_season <- function(df, season_label) {
     summarise(
       # Weighted Estimated Total Agricultural Hectares in District
       total_ha_est = sum(Plot_size_ha * plot_weight, na.rm = TRUE),
-      # Weighted Estimated LUC Hectares in District (s2q14 == 1 is 'Yes')
-      luc_ha_est = sum((Plot_size_ha * plot_weight)[as.numeric(s2q14) == 1], na.rm = TRUE)
+      # Weighted Estimated LUC Hectares in District (s2q12 == 1 is 'Yes')
+      luc_ha_est = sum((Plot_size_ha * plot_weight)[as.numeric(s2q12) == 1], na.rm = TRUE)
     ) %>%
     mutate(
       season = season_label,
@@ -123,9 +123,9 @@ ggplot(data = map_data_annual) +
     labels = scales::label_number(suffix = "%")
   ) +
   labs(
-    title = "Rwanda: Annual Land Use Consolidation Intensity (2025)",
+    title = "Rwanda: Annual Land Use Consolidation Intensity (2024)",
     subtitle = "Population-Weighted Estimates from SAS Seasons A, B, & C",
-    caption = "Source: SAS 2025 Microdata | Filtered for Agricultural Land"
+    caption = "Source: SAS 2024 Microdata | Filtered for Agricultural Land"
   ) +
   theme_minimal()
 
