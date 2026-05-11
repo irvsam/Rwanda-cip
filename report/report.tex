@@ -9,7 +9,6 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{ragged2e}
-\usepackage{amsmath}
 \usepackage{setspace}
 \onehalfspacing
 
@@ -31,25 +30,25 @@
 % ============================================================
 \noindent \textbf{Preliminary title:} \\
 Coercion and Vulnerability: District-Level Land Use Consolidation under
-Rwanda's Crop Intensification Program and Smallholder Resilience to Shocks.
+Rwanda's Crop Intensification Program and Smallholder Resilience to
+Agricultural and Weather Shocks.
 
 \vspace{0.4cm}
 
 % ============================================================
 \noindent \textbf{Research question:} \\
 How does district-level intensity of land use consolidation under Rwanda's
-Crop Intensification Program shape household dietary resilience to adverse
-shocks, and does this effect vary by household wealth?
+Crop Intensification Program shape the likelihood that households resort to
+distress coping strategies following an agricultural or weather shock, and
+does this effect vary by household wealth?
 
 \vspace{0.3cm}
 \noindent \textbf{Sub-questions:}
 \begin{itemize}[noitemsep, topsep=2pt]
-    \item Is district-level LUC intensity negatively associated with household
-          dietary diversity scores among households that experienced an adverse
-          shock in the past 12 months?
-    \item Does this vulnerability-amplifying effect increase as household
-          wealth decreases, indicating that the poorest households bear the
-          greatest resilience cost?
+    \item Is district-level LUC intensity associated with a higher likelihood
+          of distress coping among households that experienced an agricultural
+          or weather shock?
+    \item Does this effect increase as household wealth decreases?
 \end{itemize}
 
 \vspace{0.4cm}
@@ -57,70 +56,45 @@ shocks, and does this effect vary by household wealth?
 % ============================================================
 \noindent \textbf{Current knowledge:} \\
 
-\noindent \textit{Puzzle and relevance.}
-Rwanda's Crop Intensification Program (CIP), launched in 2007, mandated
-smallholder farmers to cultivate state-assigned monocrops on consolidated
-plots. Compliance was enforced through Rwanda's \textit{imihigo} performance
-contract system---a cascade of accountability running from the president down
-to individual farmers (Cioffo et al., 2016). The programme produced
-nationally reported yield increases and is widely cited as a demonstration of
-what strong state capacity can achieve in agricultural development (Cantore,
-2011).
-
-Yet this aggregate productivity narrative conceals a distributional question:
-\textit{who paid the price for these gains?} Del~Prete et al.\ (2019) find
-that land consolidation increased production of roots and tubers while
-reducing dietary diversity. Clay and Zimmerer (2020) go further, arguing that
-the CIP eroded smallholder \textit{resilience} by stripping farmers of the
-crop diversity and livelihood flexibility that previously buffered them against
-shocks. Their claim---that CIP households are more exposed to food insecurity
-when adversity strikes---has not been tested quantitatively. This study
-addresses that gap.
+Rwanda's Crop Intensification Program (CIP), launched in 2007 and ongoing,
+mandates smallholder farmers to cultivate state-assigned monocrops on
+consolidated plots, enforced through the \textit{imihigo} performance
+contract system (Cioffo et al., 2016). The programme is widely cited as a
+success, producing nationally reported yield increases---though these have
+been contested on data quality grounds (Heinen, 2022). Existing research
+reveals a distributional cost: Del~Prete et al.\ (2019), using EICV panel
+data from 2010/11 and 2013/14, find that land consolidation participation
+had ambiguous effects on dietary diversity, with no statistically significant
+overall DDS effect, but significant declines in consumption of meat, fish,
+and fruit. Crucially, they do not test whether these costs intensify when
+households face adverse shocks. Clay and Zimmerer (2020) argue qualitatively
+that the CIP eroded the crop diversity and livelihood flexibility that
+previously buffered smallholders against shocks, and that this vulnerability
+is unevenly distributed across wealth groups. Their claim has not been tested
+quantitatively. This study addresses that gap using more recent nationally
+representative data.
 
 \vspace{0.3cm}
-\noindent \textit{Theoretical approach.}
-Rwanda's \textit{imihigo} enforcement machinery enabled the state to impose a
-macro-level productivity goal by removing the micro-level adaptive strategies
-smallholders use to manage risk. The result is structural vulnerability: CIP
-households are locked into state-assigned monocrops with reduced ability to
-adjust cultivation or diversify diets in response to shocks---a cost that
-falls hardest on those with the fewest alternative resources (savings, credit,
-off-farm income).
+The core argument is that \textit{imihigo} enforcement removed the micro-level
+adaptive strategies smallholders use to manage risk---intercropping, crop
+diversification across moisture gradients, and flexible plot allocation---
+creating structural vulnerability (Clay and Zimmerer, 2020; Matin et al.,
+2018). CIP households locked into monocrops of government-selected crops,
+which Clay and Zimmerer show are among the riskiest in drought and heavy
+rain, have fewer options to absorb losses when shocks hit. This cost falls
+hardest on the poorest households, who additionally lack savings, credit
+access, and non-farm income as alternative buffers (Matin et al., 2018).
 
 \vspace{0.3cm}
-\noindent \textit{Hypotheses.}
+\noindent \textbf{Hypotheses:}
 \begin{itemize}[noitemsep, topsep=2pt]
-    \item[\textbf{H1}] Households in districts with higher LUC intensity will
-          show lower dietary diversity scores when they experience an adverse
-          shock than households in low-intensity districts
-          (\textit{resilience-reducing effect of CIP}).
-    \item[\textbf{H2}] The vulnerability-amplifying effect of LUC intensity
-          will increase as household wealth decreases
+    \item[\textbf{H1}] Among households that experienced an agricultural or
+          weather shock, those in higher-LUC districts will be more likely to
+          resort to distress coping strategies than those in lower-LUC
+          districts (\textit{resilience-reducing effect}).
+    \item[\textbf{H2}] This effect will be larger for poorer households
           (\textit{poverty-concentration hypothesis}).
 \end{itemize}
-
-\vspace{0.3cm}
-\noindent \textit{Operationalization.}
-The key independent variable is \textbf{district-level LUC intensity},
-constructed as the population-weighted average share of agricultural land
-under official land consolidation sites across the three seasons of the NISR
-Seasonal Agricultural Survey (SAS) 2024. For each season, plots are filtered
-to agricultural land (\texttt{s2q7\,=\,96}), and the LUC share is estimated
-as the sum of plot area $\times$ plot weight where \texttt{s2q12\,=\,1}
-divided by total weighted agricultural area, then averaged across seasons.
-This yields a single annual intensity measure per district. The primary
-dependent variable is the \textbf{household dietary diversity score (DDS)},
-constructed from the food consumption module of the EICV7 (2023/24) by collapsing food
-items into standard groups and counting groups consumed. The \textbf{shock
-variable} is a binary indicator from \texttt{s5eq1}--\texttt{s5eq2c} in the
-EICV7 household module, equal to
-one if the household reported at least one severe adverse shock in the past 12
-months. Household controls (wealth quintile, household size, urban/rural
-residence) are drawn from the EICV7 poverty file; savings and credit access
-from \texttt{CS\_S10C\_Savings} and \texttt{CS\_S10A1\_A2\_credits} serve as
-additional controls and potential mediators. The unit of analysis is the
-\textbf{household}, nested within districts ($N \approx 14{,}000$ households
-across 30 districts).
 
 \vspace{0.4cm}
 
@@ -136,8 +110,7 @@ across 30 districts).
     \item \textit{Measuring the Cost} --- Research design and operationalization
     \begin{enumerate}[label=4.\arabic*, noitemsep]
         \item Data and variables
-        \item Methodology
-        \item Results
+        \item Methodology and results
     \end{enumerate}
     \item \textit{Who Bears the Burden?} --- Conclusion and implications
 \end{enumerate}
@@ -145,33 +118,32 @@ across 30 districts).
 \vspace{0.4cm}
 
 % ============================================================
-\noindent \textbf{Methodology note:} \\
-The study employs OLS regression with district fixed effects on the EICV7
-cross-sectional household sample, matched to district-level LUC intensity from
-SAS 2024. The baseline model is:
+\noindent \textbf{Research design:} \\
+
+The study matches district-level LUC intensity---constructed as a
+population-weighted average share of agricultural land under consolidation
+from the NISR Seasonal Agricultural Survey (SAS) 2024 across all three
+seasons---to household-level data from the EICV7 (2023/24) survey. The
+analysis is restricted to households that reported experiencing an
+agricultural or weather shock in the past 12 months (heavy rain, floods,
+landslides, drought, crop pests or disease, livestock disease, or unusually
+high agricultural input prices), identified from the EICV7 household shock
+module ($n \approx 3{,}000$).
 
 \vspace{0.3cm}
-\begin{equation}
-\text{DDS}_{ihd} = \beta_1\,\text{LUC}_{d}
-+ \beta_2\,\text{Shock}_{ih}
-+ \beta_3\bigl(\text{LUC}_{d} \times \text{Shock}_{ih}\bigr)
-+ \mathbf{Z}_{ih}'\boldsymbol{\gamma}
-+ \alpha_{d}
-+ \varepsilon_{ihd}
-\end{equation}
-
-\noindent where $\beta_3$ is the key coefficient (a negative value supports
-H1); $\mathbf{Z}_{ih}$ includes household size, wealth quintile, urban/rural
-residence, and savings/credit access; $\alpha_{d}$ are district fixed effects;
-and errors are clustered at the district level. H2 is tested via a triple
-interaction $\text{LUC}_{d} \times \text{Shock}_{ih} \times Q_{ih}$, where
-$Q_{ih}$ is the household consumption quintile.
+The dependent variable is a binary indicator of distress coping: whether the
+household's primary coping response was harmful or irreversible---reduced food
+expenditure, sold land or productive assets, sold last female animals, withdrew
+a child from school, or resorted to begging---as opposed to adaptive strategies
+such as using savings, borrowing from a bank, or working additional hours. The
+analysis uses logistic regression with LUC intensity as the main independent
+variable, a LUC $\times$ wealth-quintile interaction term to test H2, and
+province fixed effects and urban/rural controls throughout.
 
 \vspace{0.4cm}
 
 % ============================================================
 \noindent \textbf{Data sources:}
-
 
 \vspace{0.3cm}
 \noindent
@@ -179,72 +151,66 @@ $Q_{ih}$ is the household consumption quintile.
 \toprule
 \normalfont\textbf{Variable} & \textbf{Source} & \textbf{Access} \\
 \midrule
-Dietary diversity score
-    & EICV7 (2023/24), \texttt{CS\_S8B\_Food\_Expenditure\_Consumption.dta}
+Distress coping indicator
+    & EICV7 (2023/24) household module (s5eq3a)
     & World Bank Microdata Catalog; free registration \\
 \hline
-Shock indicator
-    & EICV7 (2023/24), \texttt{CS\_S01\_S5\_S7\_Household.dta}, variables \texttt{s5eq1}--\texttt{s5eq2c}
+Shock type \& indicator
+    & EICV7 (2023/24) household module (s5eq1, s5eq2a)
     & World Bank Microdata Catalog; free registration \\
 \hline
-Household controls \& wealth
-    & EICV7, \texttt{CS\_EICV7\_poverty\_file.dta}
+Household controls
+    & EICV7 poverty file; savings \& credit modules
     & Included in EICV7 package \\
 \hline
-Savings \& credit access
-    & EICV7, \texttt{CS\_S10C\_Savings.dta}; \texttt{CS\_S10A1\_A2\_credits.dta}
-    & Included in EICV7 package \\
-\hline
-LUC intensity (weighted; \texttt{s2q12})
+LUC intensity
     & NISR Seasonal Agricultural Survey 2024, Seasons A, B \& C
     & NISR microdata catalog; free registration \\
 \bottomrule
 \end{tabularx}
- 
+
 \vspace{0.4cm}
 
 % ============================================================
 \noindent \textbf{Literature:} \\
 
-\noindent Ansoms, An, Esther Marijnen, Giuseppe Cioffo, and Jude Murison.
-2017. ``Statistics versus Livelihoods: Questioning Rwanda's Pathway out of
-Poverty.'' \textit{Review of African Political Economy} 44(151): 47--65.
-
 \noindent Cantore, Nicola. n.d. \textit{The Crop Intensification Program in
 Rwanda: A Sustainability Analysis}. London: Overseas Development Institute.
+\vspace{0.2cm}
 
 \noindent Cioffo, Giuseppe, An Ansoms, and Jude Murison. 2016.
-``Modernising Agriculture through a `New' Green Revolution: The Limits of
-the Crop Intensification Programme in Rwanda.'' \textit{Review of African
-Political Economy} 43(148): 188--204.
+``Modernising Agriculture through a `New' Green Revolution.''
+\textit{Review of African Political Economy} 43(148): 188--204.
+\vspace{0.2cm}
 
 \noindent Clay, Nathan, and Karl S. Zimmerer. 2020. ``Who Is Resilient in
-Africa's Green Revolution? Sustainable Intensification and Climate Smart
-Agriculture in Rwanda.'' \textit{Land Use Policy} 97: 104558.
+Africa's Green Revolution?'' \textit{Land Use Policy} 97: 104558.
+\vspace{0.2cm}
 
 \noindent Del~Prete, Davide, Luc Ghins, Emiliano Magrini, and Karl Pauw.
 2019. ``Land Consolidation, Specialization and Household Diets: Evidence
 from Rwanda.'' \textit{Food Policy} 83: 139--149.
+\vspace{0.2cm}
 
 \noindent Heinen, Sebastian. 2022. ``Rwanda's Agricultural Transformation
-Revisited: Stagnating Food Production, Systematic Overestimation, and a
-Flawed Performance Contract System.'' \textit{Journal of Development
-Studies} 58(10): 2044--2064.
+Revisited.'' \textit{Journal of Development Studies} 58(10): 2044--2064.
+\vspace{0.2cm}
 
-\noindent Ingelaere, Bert. 2014. ``What's on a Peasant's Mind? Experiencing
-RPF State Reach and Overreach in Post-Genocide Rwanda (2000--10).''
+\noindent Ingelaere, Bert. 2014. ``What's on a Peasant's Mind?''
 \textit{Journal of Eastern African Studies} 8(2): 214--230.
+\vspace{0.2cm}
 
 \noindent Matin, Nilufar, John Forrester, and Jonathan Ensor. 2018.
 ``What Is Equitable Resilience?'' \textit{World Development} 109: 197--205.
+\vspace{0.2cm}
 
 \noindent Nilsson, P\"{a}r. 2018. ``The Role of Land Use Consolidation in
 Improving Crop Yields among Farm Households in Rwanda.''
 \textit{Journal of Development Studies} 55(1): 1--17.
+\vspace{0.2cm}
 
-\noindent Nsabimana, Alain, Philip K. Adom, Augustin Mukamugema, and
-Jean Claude Ngabitsinze. 2023. ``The Short and Long Run Effects of Land Use
-Consolidation Programme on Farm Input Uptakes: Evidence from Rwanda.''
+\noindent Nsabimana, Alain, et al. 2023. ``The Short and Long Run Effects of
+Land Use Consolidation Programme on Farm Input Uptakes.''
 \textit{Land Use Policy} 132: 106787.
 
 \end{document}
