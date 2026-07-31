@@ -11,6 +11,7 @@ library(labelled)
 library(sf)
 library(geodata)
 library(modelsummary)   # regression tables (alt: stargazer)
+library(pandoc)
 
 data_path   <- "data/raw"
 processed_path <- "data/preprocessed" 
