@@ -45,9 +45,9 @@ dist_luc <- bind_rows(
 summary(dist_luc$luc_intensity)
 nrow(dist_luc)  # check for 30 districts
 
-saveRDS(dist_luc, file.path("data/preprocessed", "dist_luc.rds"))
+saveRDS(dist_luc, file.path(processed_path, "dist_luc.rds"))
 
 # District map for visual representation later on
 rwa_map <- gadm(country = "RWA", level = 2, path = tempdir()) %>% st_as_sf()
-saveRDS(rwa_map, file.path("data/preprocessed", "rwa_map.rds"))
+saveRDS(rwa_map, file.path(processed_path, "rwa_map.rds"))
 

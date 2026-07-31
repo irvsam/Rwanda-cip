@@ -13,6 +13,7 @@ library(geodata)
 library(modelsummary)   # regression tables (alt: stargazer)
 
 data_path   <- "data/raw"
+processed_path <- "data/preprocessed" 
 output_path <- "output"
 
 if (!dir.exists(output_path)) dir.create(output_path)
