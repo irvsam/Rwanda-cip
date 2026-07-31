@@ -32,3 +32,26 @@ count(analysis_data, shock)
 count(analysis_data, quintile_f)
 
 saveRDS(analysis_data, file.path(processed_path, "analysis_data.rds"))
+
+
+
+# Refining 
+
+analysis_data_refined <- analysis_data %>%
+  select(
+    hhid,                # household id
+    district_code,        # for joining/checking, e.g. against dist_rainfall_shock
+    log_food_ae,          # DV
+    food,                 # DV, pre-log, useful for descriptives
+    shock,                # key IV
+    luc_intensity,        # moderator
+    quintile_f,           # control + H2 stratifier
+    ur_f,                 # control
+    province_f             # control (province fixed effects)
+    # add hh size / head sex / head age here once those columns exist
+  )
+
+str(analysis_data_refined)
+nrow(analysis_data_refined)
+
+saveRDS(analysis_data_refined, file.path(processed_path, "analysis_data_refined.rds"))
