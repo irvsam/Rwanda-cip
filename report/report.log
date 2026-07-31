@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.26)  11 MAY 2026 18:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.26)  11 MAY 2026 19:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -180,39 +180,39 @@ LaTeX Font Info:    ... okay on input line 18.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 57--58
+Underfull \hbox (badness 10000) in paragraph at lines 55--56
 
  []
 
 
-Overfull \hbox (2.67928pt too wide) in paragraph at lines 59--76
+Overfull \hbox (2.67928pt too wide) in paragraph at lines 57--75
 \T1/cmr/m/n/10.95 small-holder farm-ers to cul-ti-vate state-assigned monocrops on con-sol-i-dated plots, en-forced through
  []
 
 [1
 
 {/Users/sammyirving/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 121--122
+Underfull \hbox (badness 10000) in paragraph at lines 119--120
 
  []
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 131.
+(Font)              <10.95> on input line 125.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 131.
+(Font)              <8> on input line 125.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 131.
+(Font)              <6> on input line 125.
 
-Underfull \hbox (badness 1748) in paragraph at lines 170--170
-[]|\T1/cmr/bx/n/10.95 Shock type &
+Underfull \hbox (badness 1005) in paragraph at lines 158--158
+\T1/cmr/bx/n/10.95 tion per adult
  []
 
-[2]
-Underfull \hbox (badness 10000) in paragraph at lines 175--176
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--164
 
  []
 
-[3] (./report.aux)
+[2] [3] (./report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -221,15 +221,15 @@ L3 programming layer <2026-01-19>
 Here is how much of TeX's memory you used:
  2284 strings out of 469454
  36611 string characters out of 5466511
- 448459 words of memory out of 5000000
+ 449459 words of memory out of 5000000
  30976 multiletter control sequences out of 15000+600000
  633817 words of font info for 54 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
  57i,9n,65p,164b,253s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </Users/sammyirving/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1095.600pk> </Users/sammyirving/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk> </Users/sammyirving/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </Users/sammyirving/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1095.600pk> </Users/sammyirving/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk></Users/sammyirving/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></Users/sammyirving/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/sammyirving/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on report.pdf (3 pages, 86084 bytes).
+Output written on report.pdf (3 pages, 86246 bytes).
 PDF statistics:
- 224 PDF objects out of 1000 (max. 8388607)
+ 225 PDF objects out of 1000 (max. 8388607)
  37 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)

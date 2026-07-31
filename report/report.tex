@@ -29,25 +29,23 @@
 
 % ============================================================
 \noindent \textbf{Preliminary title:} \\
-Coercion and Vulnerability: District-Level Land Use Consolidation under
-Rwanda's Crop Intensification Program and Smallholder Resilience to
-Agricultural and Weather Shocks.
+Coercion and Hunger: District-Level Land Use Consolidation under Rwanda's
+Crop Intensification Program, Household Food Welfare, and Climate
+Vulnerability.
 
 \vspace{0.4cm}
 
 % ============================================================
 \noindent \textbf{Research question:} \\
 How does district-level intensity of land use consolidation under Rwanda's
-Crop Intensification Program shape the likelihood that households resort to
-distress coping strategies following an agricultural or weather shock, and
+Crop Intensification Program affect household food consumption welfare, and
 does this effect vary by household wealth?
 
 \vspace{0.3cm}
 \noindent \textbf{Sub-questions:}
 \begin{itemize}[noitemsep, topsep=2pt]
-    \item Is district-level LUC intensity associated with a higher likelihood
-          of distress coping among households that experienced an agricultural
-          or weather shock?
+    \item Is district-level LUC intensity negatively associated with household
+          food consumption per adult equivalent?
     \item Does this effect increase as household wealth decreases?
 \end{itemize}
 
@@ -64,15 +62,19 @@ success, producing nationally reported yield increases---though these have
 been contested on data quality grounds (Heinen, 2022). Existing research
 reveals a distributional cost: Del~Prete et al.\ (2019), using EICV panel
 data from 2010/11 and 2013/14, find that land consolidation participation
-had ambiguous effects on dietary diversity, with no statistically significant
-overall DDS effect, but significant declines in consumption of meat, fish,
-and fruit. Crucially, they do not test whether these costs intensify when
-households face adverse shocks. Clay and Zimmerer (2020) argue qualitatively
-that the CIP eroded the crop diversity and livelihood flexibility that
-previously buffered smallholders against shocks, and that this vulnerability
-is unevenly distributed across wealth groups. Their claim has not been tested
-quantitatively. This study addresses that gap using more recent nationally
-representative data.
+significantly reduced consumption of meat, fish, and fruit. Clay and Zimmerer
+(2020) provide rich quantitative and qualitative evidence from four communities
+in Nyamagabe district showing that CIP fields experience more than twice the
+rate of climate-related yield losses compared to non-CIP fields, and that
+poorer households show the greatest declines in coping capacity. However,
+their findings are geographically confined to a single district in southwest
+Rwanda and have not been tested at national scale using representative survey
+data. This study addresses that gap, using nationally representative household
+data matched to district-level LUC intensity to test whether CIP's negative
+welfare effects are observable across Rwanda as a whole. The broader relevance
+is clear: food insecurity driven by structural agricultural policy is an
+established pathway from climate stress to household-level instability
+(Hsiang et al., 2013).
 
 \vspace{0.3cm}
 The core argument is that \textit{imihigo} enforcement removed the micro-level
@@ -88,10 +90,9 @@ access, and non-farm income as alternative buffers (Matin et al., 2018).
 \vspace{0.3cm}
 \noindent \textbf{Hypotheses:}
 \begin{itemize}[noitemsep, topsep=2pt]
-    \item[\textbf{H1}] Among households that experienced an agricultural or
-          weather shock, those in higher-LUC districts will be more likely to
-          resort to distress coping strategies than those in lower-LUC
-          districts (\textit{resilience-reducing effect}).
+    \item[\textbf{H1}] Households in higher-LUC districts will have lower
+          food consumption per adult equivalent than those in lower-LUC
+          districts (\textit{food welfare effect}).
     \item[\textbf{H2}] This effect will be larger for poorer households
           (\textit{poverty-concentration hypothesis}).
 \end{itemize}
@@ -123,22 +124,16 @@ access, and non-farm income as alternative buffers (Matin et al., 2018).
 The study matches district-level LUC intensity---constructed as a
 population-weighted average share of agricultural land under consolidation
 from the NISR Seasonal Agricultural Survey (SAS) 2024 across all three
-seasons---to household-level data from the EICV7 (2023/24) survey. The
-analysis is restricted to households that reported experiencing an
-agricultural or weather shock in the past 12 months (heavy rain, floods,
-landslides, drought, crop pests or disease, livestock disease, or unusually
-high agricultural input prices), identified from the EICV7 household shock
-module ($n \approx 3{,}000$).
-
-\vspace{0.3cm}
-The dependent variable is a binary indicator of distress coping: whether the
-household's primary coping response was harmful or irreversible---reduced food
-expenditure, sold land or productive assets, sold last female animals, withdrew
-a child from school, or resorted to begging---as opposed to adaptive strategies
-such as using savings, borrowing from a bank, or working additional hours. The
-analysis uses logistic regression with LUC intensity as the main independent
-variable, a LUC $\times$ wealth-quintile interaction term to test H2, and
-province fixed effects and urban/rural controls throughout.
+seasons---to household-level data from the EICV7 (2023/24) survey
+($n \approx 15{,}000$). The dependent variable is log food consumption per
+adult equivalent, drawn from the EICV7 poverty file. The analysis uses OLS
+regression with LUC intensity as the main independent variable, a LUC
+$\times$ wealth-quintile interaction term to test H2, and province fixed
+effects and urban/rural controls throughout. The climate and conflict
+relevance is addressed in the theoretical framework: CIP forces households
+into drought-vulnerable monocrops precisely in districts where agricultural
+climate shocks are most prevalent, and reduced food welfare is an established
+antecedent of household-level instability.
 
 \vspace{0.4cm}
 
@@ -151,12 +146,8 @@ province fixed effects and urban/rural controls throughout.
 \toprule
 \normalfont\textbf{Variable} & \textbf{Source} & \textbf{Access} \\
 \midrule
-Distress coping indicator
-    & EICV7 (2023/24) household module (s5eq3a)
-    & World Bank Microdata Catalog; free registration \\
-\hline
-Shock type \& indicator
-    & EICV7 (2023/24) household module (s5eq1, s5eq2a)
+Food consumption per adult equivalent
+    & EICV7 (2023/24) poverty file
     & World Bank Microdata Catalog; free registration \\
 \hline
 Household controls
@@ -194,6 +185,11 @@ from Rwanda.'' \textit{Food Policy} 83: 139--149.
 
 \noindent Heinen, Sebastian. 2022. ``Rwanda's Agricultural Transformation
 Revisited.'' \textit{Journal of Development Studies} 58(10): 2044--2064.
+\vspace{0.2cm}
+
+\noindent Hsiang, Solomon M., Marshall Burke, and Edward Miguel. 2013.
+``Quantifying the Influence of Climate on Human Conflict.''
+\textit{Science} 341(6151): 1235367.
 \vspace{0.2cm}
 
 \noindent Ingelaere, Bert. 2014. ``What's on a Peasant's Mind?''

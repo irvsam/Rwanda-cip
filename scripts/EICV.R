@@ -66,5 +66,13 @@ hh_data %>%
   count(s5eq4a) %>%
   mutate(s5eq4a = as_factor(s5eq4a))
 
-# So basically the plan is to take recovered or not recovered and see if in more LUC intense regions more recovery or less?
 
+shocks <- hh_data %>%
+  filter(as.numeric(s5eq1) == 1) %>%
+  mutate(s5eq2a = as_factor(s5eq2a)) %>%
+  count(s5eq2a)
+
+copingstrats <- hh_data %>%
+  filter(as.numeric(s5eq1) == 1) %>%
+  mutate(s5eq3a = as_factor(s5eq3a)) %>%
+  count(s5eq3a)
