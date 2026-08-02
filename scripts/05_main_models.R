@@ -93,60 +93,78 @@ modelsummary(
 
 
 # =============================================  visualising ==============================================
-
-
+source("scripts/00_setup.R")
+analysis_data <- readRDS(file.path(processed_path, "analysis_data.rds"))
 rwa_map <- readRDS(file.path(processed_path, "rwa_map.rds"))
 dist_luc <- readRDS(file.path(processed_path, "dist_luc.rds"))
 
-# Aggregate food consumption to district level, by wealth quintile
-dist_food_by_quintile <- analysis_data %>%
-  group_by(district_code, quintile_f) %>%
-  summarise(
-    mean_food_ae = mean(food, na.rm = TRUE),
-    n = n(),
-    .groups = "drop"
-  )
+# Refit the split-sample models (or load them if you saved them)
+models_by_quintile <- analysis_data %>%
+  group_split(quintile_f) %>%
+  set_names(sort(unique(analysis_data$quintile_f))) %>%
+  map(~ lm(log_food_ae ~ luc_intensity + ur_f + province_f, data = .x))
 
-# Join LUC intensity
-dist_food_by_quintile <- dist_food_by_quintile %>%
-  left_join(dist_luc %>% select(district_code, luc_intensity), by = "district_code")
+# Create a prediction grid: for each district's LUC intensity,
+# predict food consumption for each quintile, holding ur_f and 
+# province_f at their modal/mean values
+pred_grid <- expand_grid(
+  luc_intensity = seq(min(dist_luc$luc_intensity), 
+                      max(dist_luc$luc_intensity), 
+                      length.out = 30),
+  ur_f = factor(1),           # urban = 1 (or use modal value)
+  province_f = factor(1)      # province 1 (or use modal value)
+)
 
-# Join to map — one row per district-quintile combo
-# change cc2 to double from character
-rwa_map$CC_2 <- as.numeric(rwa_map$CC_2)
-
-map_data_quintile <- rwa_map %>%
-  left_join(
-    dist_food_by_quintile,
-    by = c("CC_2" = "district_code")
-  )
-
-# Create a faceted map: one panel per quintile
-ggplot(map_data_quintile) +
-  geom_sf(aes(fill = mean_food_ae), color = "white", size = 0.05) +
-  facet_wrap(~ quintile_f, nrow = 2, labeller = labeller(
-    quintile_f = c("1" = "Q1 (Poorest)", "2" = "Q2", "3" = "Q3 (Middle)", 
-                   "4" = "Q4", "5" = "Q5 (Richest)")
-  )) +
-  scale_fill_viridis_c(
-    option = "plasma",
-    name = "Mean food consumption\nper adult equiv (RWF)",
-    limits = c(
-      min(dist_food_by_quintile$mean_food_ae, na.rm = TRUE),
-      max(dist_food_by_quintile$mean_food_ae, na.rm = TRUE)
+# Generate predictions for each quintile
+preds <- bind_rows(
+  pred_grid %>% 
+    mutate(
+      quintile = "Q1",
+      predicted_log_food = predict(models_by_quintile[[1]], newdata = pred_grid),
+      predicted_food = exp(predicted_log_food)
     ),
-    trans = "sqrt"  # square-root scale stretches small differences
+  pred_grid %>% 
+    mutate(
+      quintile = "Q2",
+      predicted_log_food = predict(models_by_quintile[[2]], newdata = pred_grid),
+      predicted_food = exp(predicted_log_food)
+    ),
+  pred_grid %>% 
+    mutate(
+      quintile = "Q3",
+      predicted_log_food = predict(models_by_quintile[[3]], newdata = pred_grid),
+      predicted_food = exp(predicted_log_food)
+    ),
+  pred_grid %>% 
+    mutate(
+      quintile = "Q4",
+      predicted_log_food = predict(models_by_quintile[[4]], newdata = pred_grid),
+      predicted_food = exp(predicted_log_food)
+    ),
+  pred_grid %>% 
+    mutate(
+      quintile = "Q5",
+      predicted_log_food = predict(models_by_quintile[[5]], newdata = pred_grid),
+      predicted_food = exp(predicted_log_food)
+    )
+)
+
+# Plot: predicted food consumption by LUC intensity, colored by quintile
+ggplot(preds, aes(x = luc_intensity, y = predicted_food, color = quintile)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(
+    values = c("Q1" = "#440154", "Q2" = "#31688e", "Q3" = "#35b779", 
+               "Q4" = "#fde724", "Q5" = "#ff0000"),
+    name = "Wealth quintile"
   ) +
   labs(
-    title = "Rwanda: Food consumption by district, quintile, and LUC intensity",
-    subtitle = "EICV7 2023/24 — note poorest (Q1) consistently lower; richest (Q5) consistently higher"
+    title = "Predicted food consumption by LUC intensity and wealth",
+    subtitle = "From regression models controlling for urban/rural and province",
+    x = "District LUC intensity (%)",
+    y = "Predicted food consumption per adult equiv (RWF)"
   ) +
   theme_minimal() +
-  theme(
-    axis.text = element_blank(),
-    panel.grid = element_blank(),
-    strip.text = element_text(size = 10, face = "bold")
-  )
+  theme(legend.position = "right")
 
-ggsave(file.path(output_figures_path, "food_by_quintile_map.png"),
-       width = 14, height = 10, dpi = 300)
+ggsave(file.path(output_figures_path, "regression_predictions_by_quintile.png"),
+       width = 10, height = 6, dpi = 300)
