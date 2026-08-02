@@ -39,11 +39,11 @@ process_sas_season <- function(df, season_label) {
   # Filter for agricultural plots with a valid LUC response, group by district, and calculate total and LUC area estimates
   
   df %>%
-    # first filter for agricultural plots which would be s2q76 = 96
-    filter(s2q7 == 96) %>%
+    # first filter for agricultural plots which would be s2q7 = 96
+
+    filter(as.numeric(s2q6) == 96) %>%  # agricultural plots
     filter(!is.na(s2q12)) %>%   #  valid LUC response
     group_by(s1q2) %>%          # group by district
-    
     
     summarise(
       total_ha_est = sum(Plot_size_ha * plot_weight, na.rm = TRUE),
@@ -84,33 +84,94 @@ saveRDS(rwa_map, file.path(processed_path, "rwa_map.rds"))
 # Now for 2019
 
 # Read in the SAS 2019 Screening datasets for Seasons A, B, and C
-sas_a <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonA_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "A")
-sas_b <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonB_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "B")
-sas_c <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonC_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "C")
+sas_a_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonA_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "A")
+sas_b_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonB_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "B")
+sas_c_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonC_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "C")
 
 
 # Look at the columns to see which would be useful
-colnames(sas_a)
-colnames(sas_b)
-colnames(sas_c)
-View(labelled::look_for(sas_a))
-View(labelled::look_for(sas_b))
-View(labelled::look_for(sas_c))
+colnames(sas_a_2019)
+colnames(sas_b_2019)
+colnames(sas_c_2019)
+View(labelled::look_for(sas_a_2019))
+View(labelled::look_for(sas_b_2019))
+View(labelled::look_for(sas_c_2019))
 
-sas_a_crops <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonA-Screening_crops.dta")) %>% mutate(season = "A")
-sas_b_crops <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonB-Screening_crops.dta")) %>% mutate(season = "B")
-sas_c_crops <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonC-Screening_crops.dta")) %>% mutate(season = "C")
+sas_a_crops_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonA-Screening_crops.dta")) %>% mutate(season = "A")
+sas_b_crops_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonB-Screening_crops.dta")) %>% mutate(season = "B")
+sas_c_crops_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonC-Screening_crops.dta")) %>% mutate(season = "C")
+
+View(labelled::look_for(sas_a_crops_2019))
+View(labelled::look_for(sas_b_crops_2019))
+View(labelled::look_for(sas_c_crops_2019))
+
+# rename sas C plot_weight to Plot_weight to match the other seasons
+sas_c_2019 <- sas_c_2019 %>% rename(Plot_weight = plot_weight)
+
+join_luc_crops <- function(luc_df, crops_df) {
+  luc_agri  <- luc_df   %>% filter(as.numeric(s2q6) == 96)  # Agricultural
+  crops_agri <- crops_df %>% filter(as.numeric(s2q6) == 96)
+  
+  joined <- luc_agri %>%
+    # it is spelled plot_weight in season C so need to account for both
+    # make it all lower case
+    select(Segment_ID, s1q2, s2q1, s2q12, Plot_weight) %>%
+    inner_join(
+      crops_agri %>% select(Segment_ID, s2q1, Crop_Area),
+      by = c("Segment_ID", "s2q1")
+    )
+  
+  # Sanity check: how much data did the join keep/drop?
+  cat(sprintf(
+    "LUC agri plots: %d | Crops agri plots: %d | Joined: %d\n",
+    nrow(luc_agri), nrow(crops_agri), nrow(joined)
+  ))
+  
+  joined
+}
+
+sas_a_joined <- join_luc_crops(sas_a_2019, sas_a_crops_2019)
+sas_b_joined <- join_luc_crops(sas_b_2019, sas_b_crops_2019)
+sas_c_joined <- join_luc_crops(sas_c_2019, sas_c_crops_2019)
 
 
 
-# Get the size of the plots from each crop dataset
 
 
 
+# 2019 equivalent of process_sas_season() from 03_build_luc.R —
+# uses Crop_Area instead of Plot_size_ha, Plot_weight (capital P)
+# instead of plot_weight, and s2q12 straight (no is.na(s2q7) proxy
+# needed since the agricultural filter already happened above).
+process_sas_season_2019 <- function(df, season_label) {
+  df %>%
+    filter(!is.na(s2q12)) %>%
+    group_by(s1q2) %>%
+    summarise(
+      total_ha_est = sum(Crop_Area * Plot_weight, na.rm = TRUE),
+      luc_ha_est   = sum((Crop_Area * Plot_weight)[as.numeric(s2q12) == 1], na.rm = TRUE)
+    ) %>%
+    mutate(
+      season = season_label,
+      seasonal_intensity = (luc_ha_est / total_ha_est) * 100
+    )
+}
 
+dist_luc_2019 <- bind_rows(
+  process_sas_season_2019(sas_a_joined, "A"),
+  process_sas_season_2019(sas_b_joined, "B"),
+  process_sas_season_2019(sas_c_joined, "C")
+) %>%
+  group_by(s1q2) %>%
+  summarise(
+    luc_intensity = mean(seasonal_intensity, na.rm = TRUE),
+    district_code = as.numeric(first(s1q2))
+  )
 
+summary(dist_luc_2019$luc_intensity)
+nrow(dist_luc_2019)  # should be 30
 
-
+saveRDS(dist_luc_2019, file.path(processed_path, "dist_luc_2019.rds"))
 
 
 
