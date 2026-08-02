@@ -7,6 +7,12 @@ source("scripts/00_setup.R")
 source("scripts/01_load_eicv7.R")
 dist_luc <- readRDS(file.path(processed_path, "dist_luc.rds"))
 
+colnames(hh_data)
+lf <- labelled::look_for(hh_data)
+lf %>% as_tibble() %>% print(n = Inf)
+
+
+
 analysis_data <- hh_data %>%
   mutate(
     district_code = as.numeric(district),

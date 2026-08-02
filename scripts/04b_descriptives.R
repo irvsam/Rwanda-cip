@@ -50,3 +50,5 @@ analysis_data %>%
     mean_luc = mean(luc_intensity),
     mean_log_food_ae = mean(log_food_ae)
   )
+
+
