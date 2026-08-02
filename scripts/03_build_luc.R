@@ -136,13 +136,9 @@ sas_c_joined <- join_luc_crops(sas_c_2019, sas_c_crops_2019)
 
 
 
+# 2019 equivalent of process_sas_season() 
+# (no is.na(s2q7) proxy needed since the agricultural filter already happened above)
 
-
-
-# 2019 equivalent of process_sas_season() from 03_build_luc.R —
-# uses Crop_Area instead of Plot_size_ha, Plot_weight (capital P)
-# instead of plot_weight, and s2q12 straight (no is.na(s2q7) proxy
-# needed since the agricultural filter already happened above).
 process_sas_season_2019 <- function(df, season_label) {
   df %>%
     filter(!is.na(s2q12)) %>%
