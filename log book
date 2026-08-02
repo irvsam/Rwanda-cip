@@ -1,0 +1,28 @@
+02/08
+    
+    Regression Summary so far: Land Use Consolidation and Household Food Welfare in Rwanda
+    
+    We estimate the effect of district-level land use consolidation (LUC) intensity on household food consumption welfare using ordinary least squares regression. 
+    The dependent variable is the natural logarithm of food consumption per adult equivalent (RWF). 
+    The key independent variable is district-level LUC intensity, operationalized as the population-weighted share of agricultural land under consolidation, averaged across the three agricultural seasons of 2023/24.
+    
+    Main Finding: 
+    We find a statistically significant negative association between district LUC intensity and food consumption: 
+    a one percentage-point increase in district LUC intensity is associated with a 0.28% decrease in food consumption, 
+    controlling for wealth quintile, urban/rural status, and province (β = −0.00285, SE = 0.00089, t = −3.198, p = 0.00139).
+    
+    Distributional Effect: The LUC penalty is not evenly distributed across wealth groups. When we stratify the analysis by consumption quintile, we find:
+    
+    Quintile 1 (poorest): β = −0.00542, p = 0.0016 (significant)
+    Quintile 2: β = −0.00478, p = 0.0050 (significant)
+    Quintile 3 (middle): β = −0.00071, p = 0.712 (not significant)
+    Quintile 4: β = −0.00186, p = 0.375 (not significant)
+    Quintile 5 (richest): β = +0.00086, p = 0.728 (not significant)
+    
+    In substantive terms, poor households in high-LUC districts (>15% consolidation) consume approximately 22% less food than poor households in low-LUC districts (<5% consolidation), 
+    after controlling for province and urban/rural status. 
+    Among the richest quintile, this difference shrinks to near-zero and is not statistically distinguishable from the null.
+    
+    Interpretation: These findings support the adaptive capacity hypothesis — that land use consolidation erodes the risk-buffering strategies (crop diversification, spatial variation) 
+    that smallholder farmers have historically relied upon. Wealthier households can substitute lost agricultural diversity with market purchases and off-farm income, 
+    insulating them from consolidation-induced food welfare losses. Poorer households, lacking these substitutes, bear the full cost of structural agricultural changes.
