@@ -36,7 +36,6 @@ saveRDS(analysis_data, file.path(processed_path, "analysis_data.rds"))
 
 
 # Refining 
-
 analysis_data_refined <- analysis_data %>%
   select(
     hhid,                # household id

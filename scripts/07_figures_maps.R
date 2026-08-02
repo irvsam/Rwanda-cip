@@ -29,6 +29,9 @@ p_luc_map <- ggplot(data = map_data) +
 p_luc_map
 ggsave(file.path(output_figures_path, "luc_intensity_map.png"), p_luc_map,
        width = 8, height = 6, dpi = 300)
+
+
+
 # ==============================         Create one for 2019 data       ==============================
 
 dist_luc_2019 <- readRDS(file.path(processed_path, "dist_luc_2019.rds"))

@@ -117,7 +117,7 @@ join_luc_crops <- function(luc_df, crops_df) {
     # make it all lower case
     select(Segment_ID, s1q2, s2q1, s2q12, Plot_weight) %>%
     inner_join(
-      crops_agri %>% select(Segment_ID, s2q1, Crop_Area),
+      crops_agri %>% select(Segment_ID, s2q1, s2q4),
       by = c("Segment_ID", "s2q1")
     )
   
@@ -148,8 +148,8 @@ process_sas_season_2019 <- function(df, season_label) {
     filter(!is.na(s2q12)) %>%
     group_by(s1q2) %>%
     summarise(
-      total_ha_est = sum(Crop_Area * Plot_weight, na.rm = TRUE),
-      luc_ha_est   = sum((Crop_Area * Plot_weight)[as.numeric(s2q12) == 1], na.rm = TRUE)
+      total_ha_est = sum(s2q4 * Plot_weight, na.rm = TRUE),
+      luc_ha_est   = sum((s2q4 * Plot_weight)[as.numeric(s2q12) == 1], na.rm = TRUE)
     ) %>%
     mutate(
       season = season_label,
