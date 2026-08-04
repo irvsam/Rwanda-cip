@@ -14,11 +14,23 @@ sas_a <- read_dta(file.path(data_path, "SAS 2024/Season A/Rwa_raw_SeasonA2024_Sc
 sas_b <- read_dta(file.path(data_path, "SAS 2024/Season B/Rwa_raw_SeasonB2024_Screening.dta")) %>% mutate(season = "B")
 sas_c <- read_dta(file.path(data_path, "SAS 2024/Season C/Rwa_raw_SeasonC2024_Screening.dta")) %>% mutate(season = "C")
 
+sas_a_production <- read_dta(file.path(data_path, "SAS 2024/Season A/Rwa_raw_SeasonA2024_Production.dta")) %>% mutate(season = "A")
+sas_b_production <- read_dta(file.path(data_path, "SAS 2024/Season B/Rwa_raw_SeasonB2024_Production.dta")) %>% mutate(season = "B")
+sas_c_production <- read_dta(file.path(data_path, "SAS 2024/Season C/Rwa_raw_SeasonC2024_Production.dta")) %>% mutate(season = "C")
+
+# View(labelled::look_for(sas_a_production))
+# View(labelled::look_for(sas_b_production))
+# View(labelled::look_for(sas_c_production))
+
+sas_a_practice <- read_dta(file.path(data_path, "SAS 2024/Season A/Rwa_raw_SeasonA2024_Agricultural_practice.dta")) %>% mutate(season = "A")
+sas_b_practice <- read_dta(file.path(data_path, "SAS 2024/Season B/Rwa_raw_SeasonB2024_Agricultural_practice.dta")) %>% mutate(season = "B")
+sas_c_practice <- read_dta(file.path(data_path, "SAS 2024/Season C/Rwa_raw_SeasonC2024_Agricultural_practice.dta")) %>% mutate(season = "C")
+# View(labelled::look_for(sas_a_practice))
+# View(labelled::look_for(sas_b_practice))
+# View(labelled::look_for(sas_c_practice))
+
 
 # Look at all the labels to see which would be useful
-colnames(sas_a)
-colnames(sas_b)
-colnames(sas_c)
 # View(labelled::look_for(sas_a))
 # View(labelled::look_for(sas_b))
 # View(labelled::look_for(sas_c))
