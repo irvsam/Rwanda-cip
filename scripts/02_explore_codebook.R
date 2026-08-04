@@ -7,11 +7,7 @@
 source("scripts/00_setup.R")
 source("scripts/01_load_eicv7.R")
 
-# Search variable labels for a keyword
-labels_list <- map_df(hh_data, ~ attr(.x, "label") %||% NA) %>%
-  pivot_longer(everything(), names_to = "variable", values_to = "label")
 
-filter(labels_list, str_detect(label, "shock|recover"))
 
 # Browse full codebooks
 View(labelled::look_for(hh_data))
@@ -22,8 +18,7 @@ View(labelled::look_for(expenditure_A))
 View(labelled::look_for(expenditure_B))
 View(labelled::look_for(expenditure_C))
 
-# Quick sanity checks on the shock module used in the proposal
-hh_data %>% count(s5eq1)
+
 
 hh_data %>%
   filter(as.numeric(s5eq1) == 1) %>%
