@@ -8,9 +8,6 @@
 
 source("scripts/00_setup.R")
 analysis_data <- readRDS(file.path(processed_path, "analysis_data.rds"))
-str(analysis_data)
-head(analysis_data)
-colnames(analysis_data)
 
 # Model 1: does LUC intensity predict food welfare, controlling for wealth?
 # A negative, significant luc_intensity coefficient = higher-LUC districts
@@ -48,7 +45,7 @@ analysis_data %>%
   filter(luc_intensity > 15) %>%
   summarise(n = n(), mean_log_food = mean(log_food_ae))
 
-ana %>%
+analysis_data %>%
   filter(luc_intensity < 5) %>%
   summarise(n = n(), mean_log_food = mean(log_food_ae))
 

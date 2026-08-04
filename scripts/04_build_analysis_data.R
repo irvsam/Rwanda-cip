@@ -7,9 +7,9 @@ source("scripts/00_setup.R")
 source("scripts/01_load_eicv7.R")
 dist_luc <- readRDS(file.path(processed_path, "dist_luc.rds"))
 
-colnames(hh_data)
-lf <- labelled::look_for(hh_data)
-lf %>% as_tibble() %>% print(n = Inf)
+# colnames(hh_data)
+# lf <- labelled::look_for(hh_data)
+# lf %>% as_tibble() %>% print(n = Inf)
 
 
 
@@ -32,8 +32,6 @@ analysis_data <- hh_data %>%
   filter(!is.na(food), !is.na(luc_intensity)) %>%
   mutate(log_food_ae = log(food))   # DV 
 
-cat("Rows:", nrow(analysis_data), "\n")
-cat("Missing LUC:", sum(is.na(analysis_data$luc_intensity)), "\n")
 count(analysis_data, shock)
 count(analysis_data, quintile_f)
 
@@ -56,7 +54,5 @@ analysis_data_refined <- analysis_data %>%
     # add hh size / head sex / head age here once those columns exist
   )
 
-str(analysis_data_refined)
-nrow(analysis_data_refined)
 
 saveRDS(analysis_data_refined, file.path(processed_path, "analysis_data_refined.rds"))

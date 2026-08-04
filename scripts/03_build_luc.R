@@ -19,11 +19,11 @@ sas_c <- read_dta(file.path(data_path, "SAS 2024/Season C/Rwa_raw_SeasonC2024_Sc
 colnames(sas_a)
 colnames(sas_b)
 colnames(sas_c)
-View(labelled::look_for(sas_a))
-View(labelled::look_for(sas_b))
-View(labelled::look_for(sas_c))
+# View(labelled::look_for(sas_a))
+# View(labelled::look_for(sas_b))
+# View(labelled::look_for(sas_c))
 
-# clean up each one and just keep the following variables - segment id, s1q13, s2q1, s2q13, s2q7, s2q6, s2q12, s1q2, plotsize, plot weight
+# Clean up each one and just keep the following variables - segment id, s1q13, s2q1, s2q13, s2q7, s2q6, s2q12, s1q2, plotsize, plot weight
 clean_sas <- function(df) {
   df %>%
     select(Segment_ID,s1q1, s1q2, s1q13, s2q1, s2q6, s2q7, s2q12, Plot_size_ha, plot_weight)
@@ -74,104 +74,14 @@ nrow(dist_luc)  # check for 30 districts
 
 saveRDS(dist_luc, file.path(processed_path, "dist_luc.rds"))
 
-# District map for visual representation later on
-rwa_map <- gadm(country = "RWA", level = 2, path = tempdir()) %>% st_as_sf()
-saveRDS(rwa_map, file.path(processed_path, "rwa_map.rds"))
 
-# -------------------------------------------------------------------
+dir.create(processed_path, showWarnings = FALSE)
 
-
-# Now for 2019
-
-# Read in the SAS 2019 Screening datasets for Seasons A, B, and C
-sas_a_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonA_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "A")
-sas_b_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonB_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "B")
-sas_c_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonC_Screening_Antierosion_land consolidation.dta")) %>% mutate(season = "C")
-
-
-# Look at the columns to see which would be useful
-colnames(sas_a_2019)
-colnames(sas_b_2019)
-colnames(sas_c_2019)
-View(labelled::look_for(sas_a_2019))
-View(labelled::look_for(sas_b_2019))
-View(labelled::look_for(sas_c_2019))
-
-sas_a_crops_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonA-Screening_crops.dta")) %>% mutate(season = "A")
-sas_b_crops_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonB-Screening_crops.dta")) %>% mutate(season = "B")
-sas_c_crops_2019 <- read_dta(file.path(data_path, "older SAS/SAS 2019/rwa-sas-seasonC-Screening_crops.dta")) %>% mutate(season = "C")
-
-View(labelled::look_for(sas_a_crops_2019))
-View(labelled::look_for(sas_b_crops_2019))
-View(labelled::look_for(sas_c_crops_2019))
-
-# rename sas C plot_weight to Plot_weight to match the other seasons
-sas_c_2019 <- sas_c_2019 %>% rename(Plot_weight = plot_weight)
-
-join_luc_crops <- function(luc_df, crops_df) {
-  luc_agri  <- luc_df   %>% filter(as.numeric(s2q6) == 96)  # Agricultural
-  crops_agri <- crops_df %>% filter(as.numeric(s2q6) == 96)
-  
-  joined <- luc_agri %>%
-    # it is spelled plot_weight in season C so need to account for both
-    # make it all lower case
-    select(Segment_ID, s1q2, s2q1, s2q12, Plot_weight) %>%
-    inner_join(
-      crops_agri %>% select(Segment_ID, s2q1, s2q4),
-      by = c("Segment_ID", "s2q1")
-    )
-  
-  # Sanity check: how much data did the join keep/drop?
-  cat(sprintf(
-    "LUC agri plots: %d | Crops agri plots: %d | Joined: %d\n",
-    nrow(luc_agri), nrow(crops_agri), nrow(joined)
-  ))
-  
-  joined
-}
-
-sas_a_joined <- join_luc_crops(sas_a_2019, sas_a_crops_2019)
-sas_b_joined <- join_luc_crops(sas_b_2019, sas_b_crops_2019)
-sas_c_joined <- join_luc_crops(sas_c_2019, sas_c_crops_2019)
-
-
-
-# 2019 equivalent of process_sas_season() 
-# (no is.na(s2q7) proxy needed since the agricultural filter already happened above)
-
-process_sas_season_2019 <- function(df, season_label) {
-  df %>%
-    filter(!is.na(s2q12)) %>%
-    group_by(s1q2) %>%
-    summarise(
-      total_ha_est = sum(s2q4 * Plot_weight, na.rm = TRUE),
-      luc_ha_est   = sum((s2q4 * Plot_weight)[as.numeric(s2q12) == 1], na.rm = TRUE)
-    ) %>%
-    mutate(
-      season = season_label,
-      seasonal_intensity = (luc_ha_est / total_ha_est) * 100
-    )
-}
-
-dist_luc_2019 <- bind_rows(
-  process_sas_season_2019(sas_a_joined, "A"),
-  process_sas_season_2019(sas_b_joined, "B"),
-  process_sas_season_2019(sas_c_joined, "C")
-) %>%
-  group_by(s1q2) %>%
-  summarise(
-    luc_intensity = mean(seasonal_intensity, na.rm = TRUE),
-    district_code = as.numeric(first(s1q2))
-  )
-
-summary(dist_luc_2019$luc_intensity)
-nrow(dist_luc_2019)  # should be 30
-
-saveRDS(dist_luc_2019, file.path(processed_path, "dist_luc_2019.rds"))
-
-
-
-
-
-
+# 3. Try downloading with error handling
+tryCatch({
+  rwa_map <- gadm(country = "RWA", level = 2, path = processed_path) %>% st_as_sf()
+  saveRDS(rwa_map, file.path(processed_path, "rwa_map.rds"))
+}, error = function(e) {
+  print(paste("Error:", e$message))
+})
 
