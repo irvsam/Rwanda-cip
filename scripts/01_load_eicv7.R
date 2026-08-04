@@ -12,3 +12,4 @@ credits_data  <- read_dta(file.path(data_path, "EICV7/CS_S10A1_A2_credits.dta"))
 expenditure_A <- read_dta(file.path(data_path, "EICV7/CS_S8A1_Expenditure.dta"))
 expenditure_B <- read_dta(file.path(data_path, "EICV7/CS_S8A2_Expenditure.dta"))
 expenditure_C <- read_dta(file.path(data_path, "EICV7/CS_S8A3_Expenditure.dta"))
+

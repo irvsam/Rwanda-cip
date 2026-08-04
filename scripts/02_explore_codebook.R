@@ -14,13 +14,13 @@ labels_list <- map_df(hh_data, ~ attr(.x, "label") %||% NA) %>%
 filter(labels_list, str_detect(label, "shock|recover"))
 
 # Browse full codebooks
-# View(labelled::look_for(hh_data))
-# View(labelled::look_for(poverty_data))
-# View(labelled::look_for(savings_data))
-# View(labelled::look_for(credits_data))
-# View(labelled::look_for(expenditure_A))
-# View(labelled::look_for(expenditure_B))
-# View(labelled::look_for(expenditure_C))
+View(labelled::look_for(hh_data))
+View(labelled::look_for(poverty_data))
+View(labelled::look_for(savings_data))
+View(labelled::look_for(credits_data))
+View(labelled::look_for(expenditure_A))
+View(labelled::look_for(expenditure_B))
+View(labelled::look_for(expenditure_C))
 
 # Quick sanity checks on the shock module used in the proposal
 hh_data %>% count(s5eq1)
