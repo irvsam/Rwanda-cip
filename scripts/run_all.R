@@ -9,3 +9,5 @@ source("scripts/03_build_luc.R")
 source("scripts/04_build_analysis_data.R")
 source("scripts/05_main_models.R")
 source("scripts/07_figures_maps.R")
+
+print("All scripts executed successfully. Check the output folder for results and figures.")

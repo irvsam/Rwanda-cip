@@ -161,6 +161,86 @@ modelsummary(
 
 
 
+# ============================================================
+# MECHANISM TEST
+# Does LUC intensity affect an intermediate channel (own-production
+# / self-provisioning), even if the headline consumption regression
+# is underpowered with only 30 district clusters? This is a
+# mechanism/pathway check, not a fishing expedition — one
+# pre-specified intermediate outcome, reported regardless of result.
+# ============================================================
+
+library(estimatr)
+
+source("scripts/00_setup.R")
+source("scripts/01_load_eicv7.R")
+analysis_data <- readRDS(file.path(processed_path, "analysis_data.rds"))
+dist_luc <- readRDS(file.path(processed_path, "dist_luc.rds"))
+
+# ---- Build own-production variable ----
+# Fix: households with zero valid s08a4_4 rows get NA, not -Inf.
+# max(..., na.rm = TRUE) on an all-NA/empty vector silently returns
+# -Inf, which can crash lm_robust()'s underlying C++ code rather than
+# throwing a normal R error.
+own_prod <- expenditure_C %>%
+  select(hhid, s08a4_4) %>%
+  group_by(hhid) %>%
+  summarise(
+    has_own_prod = if (all(is.na(s08a4_4))) NA_real_
+    else max(as.numeric(s08a4_4) == 1, na.rm = TRUE),
+    n_own_prod_items = sum(as.numeric(s08a4_4) == 1, na.rm = TRUE),
+    n_missing        = sum(is.na(s08a4_4))
+  )
+
+# Check how many households this affects
+sum(is.na(own_prod$has_own_prod))
+
+# Merge into the analysis dataset
+mechanism_data <- analysis_data %>%
+  left_join(own_prod, by = "hhid") %>%
+  filter(is.finite(has_own_prod))  # defensive: drop any NA/-Inf/NaN
+
+nrow(mechanism_data)  # sanity check against analysis_data's n
+
+# ---- Model A: does LUC predict whether a household has ANY own production? ----
+model_mech_binary <- lm_robust(
+  has_own_prod ~ luc_intensity + quintile_f + ur_f + province_f,
+  data = mechanism_data,
+  clusters = district_code
+)
+summary(model_mech_binary)
+
+# ---- Model B: does LUC predict HOW MANY own-production items a household reports? ----
+model_mech_count <- lm_robust(
+  n_own_prod_items ~ luc_intensity + quintile_f + ur_f + province_f,
+  data = mechanism_data,
+  clusters = district_code
+)
+summary(model_mech_count)
+
+# ---- Same question, split by quintile ----
+mech_models_by_quintile <- mechanism_data %>%
+  group_split(quintile_f) %>%
+  set_names(sort(unique(mechanism_data$quintile_f))) %>%
+  map(~ lm_robust(
+    has_own_prod ~ luc_intensity + ur_f + province_f,
+    data = .x,
+    clusters = district_code
+  ))
+
+map(mech_models_by_quintile, summary)
+
+# ---- Export for the paper ----
+modelsummary(
+  c(
+    list("Has own production" = model_mech_binary,
+         "N own-production items" = model_mech_count),
+    mech_models_by_quintile
+  ),
+  output = file.path(output_tables_path, "mechanism_results.docx")
+)
+
+
 # TODO: work on visualisations because they are not 100% perfect yet
 
 
