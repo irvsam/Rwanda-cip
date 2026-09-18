@@ -5,6 +5,8 @@
 
 source("scripts/00_setup.R")
 
+## loading eicv data focusing on the core modules
+
 hh_data       <- read_dta(file.path(data_path, "EICV7/CS_S01_S5_S7_Household.dta"))
 poverty_data  <- read_dta(file.path(data_path, "EICV7/CS_EICV7_poverty_file.dta"))
 savings_data  <- read_dta(file.path(data_path, "EICV7/CS_S10C_Savings.dta"))

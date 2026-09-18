@@ -8,6 +8,10 @@
 
 source("scripts/00_setup.R")
 
+## step 1 of approach: create an LUC intensity variable for each season, then average across seasons to get a district-level LUC intensity variable.
+## then map this onto a map of rwanda and use this as the comparator
+
+## this is now the independent variable of interest in the main models, and is used to create the interaction term with quintile_f
 
 # Read in the SAS 2024 Screening datasets for Seasons A, B, and C
 sas_a <- read_dta(file.path(data_path, "SAS 2024/Season A/Rwa_raw_SeasonA2024_Screening.dta")) %>% mutate(season = "A")

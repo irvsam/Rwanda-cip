@@ -5,6 +5,9 @@
 # Catches any possible coding errors
 # ============================================================
 
+# H1: District-level LUC intensity is negatively associated with household food consumption welfare.
+# H2: The negative association between LUC intensity and food consumption welfare is stronger among poorer households (lower consumption quintiles).
+
 source("scripts/00_setup.R")
 analysis_data <- readRDS(file.path(processed_path, "analysis_data.rds"))
 
@@ -12,7 +15,6 @@ vars_of_interest <- analysis_data %>%
   transmute(
     `Food consumption per AE (RWF)`      = food,
     `Food consumption per AE (log)`      = log_food_ae,
-    `Climate shock (0/1)`                = shock,
     `District LUC intensity (%)`         = luc_intensity,
     `Consumption quintile`               = quintile_f,
     `Urban/rural`                        = ur_f,
@@ -31,24 +33,24 @@ datasummary_skim(vars_of_interest, type = "categorical",
                  output = file.path(output_tables_path, "table1_descriptives_categorical.docx")
 )
 
-# Sanity check ahead of H2: are shock exposure and LUC balanced across
-# quintiles, or is one quintile driving everything?
+# Sanity check: 
+# is LUC intensity itself balanced across quintiles, or do poorer households happen to cluster in high-LUC districts already (before you even look at consumption)?
 analysis_data %>%
   group_by(quintile_f) %>%
   summarise(
     n = n(),
-    pct_shock = mean(shock) * 100,
     mean_luc = mean(luc_intensity),
     mean_log_food_ae = mean(log_food_ae)
   )
 
-# Same, split by shock status — the group means H1 is actually comparing
+# Group means H1 is now comparing: food welfare by LUC level
 analysis_data %>%
-  group_by(shock) %>%
+  mutate(high_luc = luc_intensity > median(luc_intensity, na.rm = TRUE)) %>%
+  group_by(high_luc) %>%
   summarise(
     n = n(),
-    mean_luc = mean(luc_intensity),
-    mean_log_food_ae = mean(log_food_ae)
+    mean_log_food_ae = mean(log_food_ae),
+    mean_food = mean(food)
   )
 
 

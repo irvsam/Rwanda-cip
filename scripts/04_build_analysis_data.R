@@ -20,10 +20,6 @@ analysis_data <- hh_data %>%
     ur_f          = as.factor(as.numeric(ur)),
     province_f    = as.factor(as.numeric(province)),    # province fixed effects
     
-    # Key IV: most severe shock in past 12 months is
-    # climate-related (s5eq2a categories 1-6: drought, irregular rainfall,
-    # heavy rain, flooding, landslides, crop/livestock disease)
-    shock = as.numeric(as.numeric(s5eq1) == 1 & as.numeric(s5eq2a) %in% 1:6)
     
     # TODO: add household size and household-head sex/age controls once confirmed
   ) %>%
@@ -32,7 +28,7 @@ analysis_data <- hh_data %>%
   filter(!is.na(food), !is.na(luc_intensity)) %>%
   mutate(log_food_ae = log(food))   # DV 
 
-count(analysis_data, shock)
+
 count(analysis_data, quintile_f)
 
 saveRDS(analysis_data, file.path(processed_path, "analysis_data.rds"))
@@ -42,16 +38,14 @@ saveRDS(analysis_data, file.path(processed_path, "analysis_data.rds"))
 # Refining 
 analysis_data_refined <- analysis_data %>%
   select(
-    hhid,                # household id
-    district_code,        # for joining/checking, e.g. against dist_rainfall_shock
-    log_food_ae,          # DV
-    food,                 # DV, pre-log, useful for descriptives
-    shock,                # key IV
-    luc_intensity,        # moderator
-    quintile_f,           # control + H2 stratifier
+    hhid,
+    district_code,
+    log_food_ae,
+    food,
+    luc_intensity,        # key IV
+    quintile_f,           # control + stratifier for testing distributional effect
     ur_f,                 # control
-    province_f             # control (province fixed effects)
-    # add hh size / head sex / head age here once those columns exist
+    province_f            # control (province fixed effects)
   )
 
 

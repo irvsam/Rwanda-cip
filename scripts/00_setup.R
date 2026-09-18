@@ -24,3 +24,4 @@ if (!dir.exists(file.path(output_path, "tables")))  dir.create(file.path(output_
 output_figures_path <- file.path(output_path, "figures")
 output_tables_path  <- file.path(output_path, "tables")
 
+

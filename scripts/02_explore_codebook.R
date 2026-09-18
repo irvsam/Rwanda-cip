@@ -1,7 +1,6 @@
 # ============================================================
 # 02_explore_codebook.R
-# exploring variables etc
-# run line by line
+# exploring variables etc this is just personal exploration
 # ============================================================
 
 source("scripts/00_setup.R")
