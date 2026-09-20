@@ -137,4 +137,25 @@ modelsummary(
          "N own-production items" = model_mech_count),
     mech_models_by_quintile),
   output = file.path(output_tables_path, "mechanism_results.docx")
+  
 )
+
+
+
+# Restrict the district-level secondary analysis to farming households
+# only -- defined as households appearing in the AHS crop dataset
+# (any season), regardless of whether they're in the crop_hhi analysis
+# sample specifically.
+farming_hhids <- unique(crop_data_raw$hhid)
+
+analysis_data_farmers <- analysis_data %>%
+  filter(hhid %in% farming_hhids)
+
+nrow(analysis_data_farmers)  # how much did the sample shrink?
+
+model_main_farmers <- lm_robust(
+  log_food_ae ~ luc_intensity + quintile_f + ur_f + province_f,
+  data = analysis_data_farmers,
+  clusters = district_code
+)
+summary(model_main_farmers)

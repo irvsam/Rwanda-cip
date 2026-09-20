@@ -159,3 +159,10 @@ modelsummary(
 
 cor(extension_data$crop_hhi, as.numeric(as.character(extension_data$quintile_f)))
 summary(lm(crop_hhi ~ quintile_f, data = extension_data))$r.squared
+
+
+
+crop_data_raw <- read_dta("data/raw/AHS 2024/AHS2024_Section3_4_CROP_GROWN__SEEDS_AND_PRODUCTION___AGRICULTURAL_INPUTS_AND_PRACTICES.dta")
+
+n_distinct(crop_data_raw$hhid)                               # households with ANY crop record, any season
+n_distinct(crop_data_raw$hhid[crop_data_raw$Season == 1])     # households with a Season A record
