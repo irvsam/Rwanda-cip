@@ -3,44 +3,33 @@
 # District-level analysis: does LUC intensity affect household food
 # welfare, controlling for wealth -- and is that effect concentrated
 # among poorer households?
+#
+# This is the SECONDARY / robustness analysis in the final paper
+# structure. The PRIMARY analysis (household-level crop concentration
+# as IV, LUC intensity as moderator) lives in
+# 06_household_crop_concentration.R
 
-# restricted to farming households (any household
-# appearing in the AHS 2024 crop dataset, any season). 
 # ============================================================
 
 source("scripts/00_setup.R")
 analysis_data <- readRDS(file.path(processed_path, "analysis_data.rds"))
 
-# ---- Identify farming households from the AHS 2024 crop dataset ----
-# Any household appearing in ANY season's crop records counts as a
-# farming household here 
-
-crop_data_raw <- read_dta(
-  "data/raw/AHS 2024/AHS2024_Section3_4_CROP_GROWN__SEEDS_AND_PRODUCTION___AGRICULTURAL_INPUTS_AND_PRACTICES.dta"
-)
-farming_hhids <- unique(crop_data_raw$hhid)
-
-analysis_data_farmers <- analysis_data %>%
-  filter(hhid %in% farming_hhids)
-
-nrow(analysis_data_farmers)  # sample size after restricting to farmers
-
-# ---- Naive OLS (unclustered), farming households only ----
+# ---- Naive OLS (unclustered) ----
 model_main_naive <- lm(
   log_food_ae ~ luc_intensity + quintile_f + ur_f + province_f,
-  data = analysis_data_farmers
+  data = analysis_data
 )
 summary(model_main_naive)
 
 model_interaction_naive <- lm(
   log_food_ae ~ luc_intensity * quintile_f + ur_f + province_f,
-  data = analysis_data_farmers
+  data = analysis_data
 )
 summary(model_interaction_naive)
 
-models_by_quintile_naive <- analysis_data_farmers %>%
+models_by_quintile_naive <- analysis_data %>%
   group_split(quintile_f) %>%
-  set_names(sort(unique(analysis_data_farmers$quintile_f))) %>%
+  set_names(sort(unique(analysis_data$quintile_f))) %>%
   map(~ lm(log_food_ae ~ luc_intensity + ur_f + province_f, data = .x))
 
 map(models_by_quintile_naive, summary)
@@ -57,21 +46,21 @@ modelsummary(
 # to it; clustering by district_code corrects the standard errors.
 model_main <- lm_robust(
   log_food_ae ~ luc_intensity + quintile_f + ur_f + province_f,
-  data = analysis_data_farmers,
+  data = analysis_data,
   clusters = district_code
 )
 summary(model_main)
 
 model_interaction <- lm_robust(
   log_food_ae ~ luc_intensity * quintile_f + ur_f + province_f,
-  data = analysis_data_farmers,
+  data = analysis_data,
   clusters = district_code
 )
 summary(model_interaction)
 
-models_by_quintile <- analysis_data_farmers %>%
+models_by_quintile <- analysis_data %>%
   group_split(quintile_f) %>%
-  set_names(sort(unique(analysis_data_farmers$quintile_f))) %>%
+  set_names(sort(unique(analysis_data$quintile_f))) %>%
   map(~ lm_robust(
     log_food_ae ~ luc_intensity + ur_f + province_f,
     data = .x,
@@ -91,7 +80,6 @@ modelsummary(
 # Does LUC intensity affect own-production, an intermediate channel
 # plausibly linking district-level consolidation to reduced food
 # consumption? One pre-specified test, reported regardless of result.
-# Restricted to the same farming-household sample for consistency.
 # ============================================================
 
 if (!exists("expenditure_C")) source("scripts/01_load_eicv7.R")
@@ -113,7 +101,7 @@ own_prod <- expenditure_C %>%
 
 sum(is.na(own_prod$has_own_prod))  # how many households this affects
 
-mechanism_data <- analysis_data_farmers %>%
+mechanism_data <- analysis_data %>%
   left_join(own_prod, by = "hhid") %>%
   filter(is.finite(has_own_prod))  # defensive: drop any NA/-Inf/NaN
 
@@ -149,4 +137,5 @@ modelsummary(
          "N own-production items" = model_mech_count),
     mech_models_by_quintile),
   output = file.path(output_tables_path, "mechanism_results.docx")
+  
 )
