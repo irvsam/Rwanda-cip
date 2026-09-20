@@ -166,3 +166,11 @@ crop_data_raw <- read_dta("data/raw/AHS 2024/AHS2024_Section3_4_CROP_GROWN__SEED
 
 n_distinct(crop_data_raw$hhid)                               # households with ANY crop record, any season
 n_distinct(crop_data_raw$hhid[crop_data_raw$Season == 1])     # households with a Season A record
+
+
+
+model_ext_wealth_luc <- lm_robust(
+  log_food_ae ~ crop_hhi_c * luc_intensity_c * wealth_group + ur_f + province_f,
+  data = extension_data,
+  clusters = district_code
+)

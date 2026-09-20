@@ -263,3 +263,77 @@ message("Table generated and fixed: ", tex_path)
 message("All figures and tables generated successfully.")
 
 
+# ============================================================
+# FIGURE 1: District-level LUC coefficient by quintile,
+# naive OLS vs. clustered (CR2) standard errors.
+# Shape encodes BOTH model type and significance (greyscale-safe,
+# no colour needed): filled = significant, open = not; circle =
+# naive, triangle = clustered.
+# ============================================================
+
+models_by_quintile_naive <- analysis_data %>%
+  group_split(quintile_f) %>%
+  set_names(sort(unique(analysis_data$quintile_f))) %>%
+  map(~ lm(log_food_ae ~ luc_intensity + ur_f + province_f, data = .x))
+
+models_by_quintile <- analysis_data %>%
+  group_split(quintile_f) %>%
+  set_names(sort(unique(analysis_data$quintile_f))) %>%
+  map(~ lm_robust(log_food_ae ~ luc_intensity + ur_f + province_f,
+                  data = .x, clusters = district_code))
+
+extract_naive <- function(m, q) {
+  s <- summary(m)$coefficients["luc_intensity", ]
+  tibble(quintile = q, model = "Naive OLS",
+         estimate = s["Estimate"], se = s["Std. Error"], pvalue = s["Pr(>|t|)"])
+}
+
+extract_clustered <- function(m, q) {
+  s <- summary(m)$coefficients["luc_intensity", ]
+  tibble(quintile = q, model = "Clustered (CR2)",
+         estimate = s["Estimate"], se = s["Std. Error"], pvalue = s["Pr(>|t|)"])
+}
+
+coef_data <- bind_rows(
+  map2_dfr(models_by_quintile_naive, names(models_by_quintile_naive), extract_naive),
+  map2_dfr(models_by_quintile, names(models_by_quintile), extract_clustered)
+) %>%
+  mutate(
+    quintile_label = recode(quintile,
+                            "1" = "Q1\n(Poorest)", "2" = "Q2", "3" = "Q3\n(Middle)",
+                            "4" = "Q4", "5" = "Q5\n(Richest)"),
+    ci_lower = estimate - 1.96 * se,
+    ci_upper = estimate + 1.96 * se,
+    significant = ifelse(pvalue < 0.05, "sig", "ns"),
+    shape_group = case_when(
+      model == "Naive OLS" & significant == "sig"       ~ "Naive, p < 0.05",
+      model == "Naive OLS" & significant == "ns"         ~ "Naive, n.s.",
+      model == "Clustered (CR2)" & significant == "sig"  ~ "Clustered, p < 0.05",
+      model == "Clustered (CR2)" & significant == "ns"   ~ "Clustered, n.s."
+    ),
+    shape_group = factor(shape_group, levels = c(
+      "Naive, p < 0.05", "Naive, n.s.",
+      "Clustered, p < 0.05", "Clustered, n.s."
+    ))
+  )
+
+p1_coef <- ggplot(coef_data, aes(x = quintile_label, y = estimate,
+                                 shape = shape_group,
+                                 group = model)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper),
+                position = position_dodge(width = 0.5),
+                width = 0.25, linewidth = 0.6, color = "black") +
+  geom_point(position = position_dodge(width = 0.5), size = 3.2,
+             fill = "black", color = "black") +
+  scale_shape_manual(
+    values = c("Naive, p < 0.05" = 16, "Naive, n.s." = 1,
+               "Clustered, p < 0.05" = 17, "Clustered, n.s." = 2),
+    name = NULL
+  ) +
+  labs(x = "Wealth quintile", y = "Coefficient on LUC intensity (log scale)") +
+  theme_paper
+
+ggsave(file.path(output_figures_path, "fig1_coefficients_by_quintile.png"), p1_coef,
+       width = 8.5, height = 5.5, dpi = 300)
+
