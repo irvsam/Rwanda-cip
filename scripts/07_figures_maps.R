@@ -1,242 +1,268 @@
 # ============================================================
-# 07_figures_maps.R
-# Visual output for Results section
+# 07_figures.R
+# Visual output for the Results section.
+#
+# ACADEMIC STYLE
+#
+# Figures use CLUSTERED models throughout.
 # ============================================================
 
 source("scripts/00_setup.R")
-dist_luc <- readRDS(file.path(processed_path, "dist_luc.rds"))
-rwa_map  <- readRDS(file.path(processed_path, "rwa_map.rds"))
+analysis_data   <- readRDS(file.path(processed_path, "analysis_data.rds"))
+dist_luc        <- readRDS(file.path(processed_path, "dist_luc.rds"))
+rwa_map         <- readRDS(file.path(processed_path, "rwa_map.rds"))
+
+# A clean, print-friendly, serif-font base theme reused across every figure.
+theme_paper <- theme_classic(base_size = 13, base_family = "serif") +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(size = 11),
+    axis.title = element_text(size = 12),
+    panel.grid.major.y = element_line(color = "grey90", linewidth = 0.3)
+  )
+
+# ============================================================
+# MAP 1: District-level LUC intensity
+# ============================================================
 
 map_data <- rwa_map %>%
   left_join(dist_luc %>% mutate(district_code = as.character(district_code)),
             by = c("CC_2" = "district_code"))
 
-p_luc_map <- ggplot(data = map_data) +
-  geom_sf(aes(fill = luc_intensity), color = "white", size = 0.1) +
-  scale_fill_viridis_c(
-    option = "mako",
-    name = "Avg Annual % Land in LUC",
-    labels = scales::label_number(suffix = "%")
-  ) +
-  labs(
-    title = "Rwanda: Annual Land Use Consolidation Intensity (2023/24)",
-    subtitle = "Population-weighted estimates from SAS Seasons A, B & C",
-    caption = "Source: NISR SAS 2023/24 Microdata"
-  ) +
-  theme_minimal() +
-  theme(axis.text = element_blank(), panel.grid = element_blank())
+p_luc_map <- ggplot(map_data) +
+  geom_sf(aes(fill = luc_intensity), color = "white", linewidth = 0.1) +
+  scale_fill_gradient(low = "grey90", high = "black",
+                      name = "LUC intensity (%)") +
+  theme_void(base_size = 13, base_family = "serif") +
+  theme(legend.position = "bottom")
 
-p_luc_map
 ggsave(file.path(output_figures_path, "luc_intensity_map.png"), p_luc_map,
        width = 8, height = 6, dpi = 300)
-print(p_luc_map)
 
-
-# ===== MAP 2: Mean food consumption by district (Q1 poorest only) =====
-
-analysis_data <- readRDS(file.path(processed_path, "analysis_data_refined.rds"))
-
+# ============================================================
+# MAP 2: Mean food consumption by district, poorest quintile
+# ============================================================
 
 q1_food_by_dist <- analysis_data %>%
   filter(as.numeric(quintile_f) == 1) %>%
   group_by(district_code) %>%
-  summarise(
-    mean_food = mean(food, na.rm = TRUE),
-    n = n()
-  )
+  summarise(mean_food = mean(food, na.rm = TRUE), n = n())
 
 map_food_q1 <- rwa_map %>%
   left_join(q1_food_by_dist %>% mutate(district_code = as.character(district_code)),
             by = c("CC_2" = "district_code"))
 
-p2_food_q1 <- ggplot(map_food_q1) +
-  geom_sf(aes(fill = mean_food / 1e6), color = "white", size = 0.2) +  # convert to millions
-  scale_fill_viridis_c(
-    option = "viridis",
-    name = "Food spending\n(millions RWF)",
-    direction = 1
-  ) +
-  labs(
-    title = "Rwanda: Food Consumption by District (Poorest Quintile)",
-    subtitle = "Mean food spending per adult equivalent (Q1 households only)",
-    caption = "Source: EICV7 2023/24"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text = element_blank(),
-    panel.grid = element_blank(),
-    plot.title = element_text(face = "bold", size = 12),
-    plot.subtitle = element_text(size = 10),
-    legend.position = "right"
-  )
+p_food_q1 <- ggplot(map_food_q1) +
+  geom_sf(aes(fill = mean_food / 1e6), color = "white", linewidth = 0.2) +
+  scale_fill_gradient(low = "grey90", high = "black",
+                      name = "Food spending\n(millions RWF)") +
+  theme_void(base_size = 13, base_family = "serif") +
+  theme(legend.position = "bottom")
 
-ggsave(file.path(output_figures_path, "food_q1_by_district.png"),
-       p2_food_q1, width = 10, height = 8, dpi = 300)
-
-print(p2_food_q1)
+ggsave(file.path(output_figures_path, "food_q1_by_district.png"), p_food_q1,
+       width = 10, height = 8, dpi = 300)
 
 # ============================================================
-# 10_results_visualizations.R
-# Publication-quality figures for main findings
+# FIGURE 1: District-level LUC coefficient by quintile (CLUSTERED)
+# Significance shown via shape (filled vs. open point) -- already
+# greyscale-safe, no color used.
 # ============================================================
-
-source("scripts/00_setup.R")
-analysis_data <- readRDS(file.path(processed_path, "analysis_data_refined.rds"))
-
-# ===== FIGURE 1: Regression coefficients by quintile =====
-# Shows the core finding: LUC penalty is concentrated in Q1-Q2
 
 models_by_quintile <- analysis_data %>%
   group_split(quintile_f) %>%
   set_names(sort(unique(analysis_data$quintile_f))) %>%
-  map(~ lm(log_food_ae ~ luc_intensity + ur_f + province_f, data = .x))
+  map(~ lm_robust(log_food_ae ~ luc_intensity + ur_f + province_f,
+                  data = .x, clusters = district_code))
 
-# Extract coefficients
-coef_data <- tibble(
-  quintile = c("Q1\n(Poorest)", "Q2", "Q3\n(Middle)", "Q4", "Q5\n(Richest)"),
-  estimate = c(
-    coef(models_by_quintile[[1]])["luc_intensity"],
-    coef(models_by_quintile[[2]])["luc_intensity"],
-    coef(models_by_quintile[[3]])["luc_intensity"],
-    coef(models_by_quintile[[4]])["luc_intensity"],
-    coef(models_by_quintile[[5]])["luc_intensity"]
-  ),
-  se = c(
-    summary(models_by_quintile[[1]])$coefficients["luc_intensity", "Std. Error"],
-    summary(models_by_quintile[[2]])$coefficients["luc_intensity", "Std. Error"],
-    summary(models_by_quintile[[3]])$coefficients["luc_intensity", "Std. Error"],
-    summary(models_by_quintile[[4]])$coefficients["luc_intensity", "Std. Error"],
-    summary(models_by_quintile[[5]])$coefficients["luc_intensity", "Std. Error"]
-  ),
-  pvalue = c(
-    summary(models_by_quintile[[1]])$coefficients["luc_intensity", "Pr(>|t|)"],
-    summary(models_by_quintile[[2]])$coefficients["luc_intensity", "Pr(>|t|)"],
-    summary(models_by_quintile[[3]])$coefficients["luc_intensity", "Pr(>|t|)"],
-    summary(models_by_quintile[[4]])$coefficients["luc_intensity", "Pr(>|t|)"],
-    summary(models_by_quintile[[5]])$coefficients["luc_intensity", "Pr(>|t|)"]
+coef_data <- map2_dfr(models_by_quintile, names(models_by_quintile), function(m, q) {
+  s <- summary(m)$coefficients["luc_intensity", ]
+  tibble(
+    quintile = q,
+    estimate = s["Estimate"],
+    se       = s["Std. Error"],
+    pvalue   = s["Pr(>|t|)"]
   )
-) %>%
+}) %>%
   mutate(
+    quintile_label = recode(quintile,
+                            "1" = "Q1\n(Poorest)", "2" = "Q2", "3" = "Q3\n(Middle)",
+                            "4" = "Q4", "5" = "Q5\n(Richest)"),
     ci_lower = estimate - 1.96 * se,
     ci_upper = estimate + 1.96 * se,
-    significant = pvalue < 0.05
+    significant = ifelse(pvalue < 0.05, "p < 0.05", "n.s.")
   )
 
-p1_coef <- ggplot(coef_data, aes(x = reorder(quintile, -estimate), y = estimate, color = significant)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.3, size = 1) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50", size = 0.5) +
-  scale_color_manual(
-    values = c("TRUE" = "#e74c3c", "FALSE" = "#95a5a6"),
-    name = "Significant\n(p < 0.05)",
-    labels = c("TRUE" = "Yes", "FALSE" = "No")
-  ) +
-  labs(
-    title = "LUC Intensity Effect on Food Consumption by Wealth Quintile",
-    subtitle = "Coefficient ± 95% CI. Negative = lower food consumption.",
-    x = "Wealth Quintile",
-    y = "Coefficient (log scale)",
-    caption = "Source: EICV7 2023/24, controlling for urban/rural and province"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 12),
-    plot.subtitle = element_text(size = 10, color = "gray40"),
-    axis.title = element_text(size = 10),
-    panel.grid.major.x = element_blank(),
-    legend.position = "right"
-  )
+p1_coef <- ggplot(coef_data, aes(x = reorder(quintile_label, -estimate), y = estimate,
+                                 shape = significant)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.3,
+                linewidth = 0.6, color = "black") +
+  geom_point(size = 3.5, fill = "black", color = "black") +
+  scale_shape_manual(values = c("p < 0.05" = 16, "n.s." = 21), name = NULL) +
+  labs(x = "Wealth quintile", y = "Coefficient on LUC intensity (log scale)") +
+  theme_paper
 
-ggsave(file.path(output_figures_path, "10_coefficients_by_quintile.png"),
-       p1_coef, width = 10, height = 6, dpi = 300)
+ggsave(file.path(output_figures_path, "fig1_coefficients_by_quintile.png"), p1_coef,
+       width = 8, height = 5.5, dpi = 300)
 
-print(p1_coef)
-
-
-
-# ===== FIGURE 2: Predicted food consumption by LUC and quintile (% change from baseline) =====
-# Shows what the regression predicts as percentage change from 0% LUC baseline
+# ============================================================
+# FIGURE 2: Predicted food consumption by LUC intensity and quintile
+# (district-level, secondary analysis)
+# Grey shade AND linetype both map to quintile.
+# ============================================================
 
 pred_grid <- expand_grid(
-  luc_intensity = seq(min(analysis_data$luc_intensity, na.rm = TRUE),
-                      max(analysis_data$luc_intensity, na.rm = TRUE),
-                      length.out = 50),
-  quintile = 1:5,
-  ur_f = factor(1),
-  province_f = factor(1)
+  luc_intensity = seq(min(dist_luc$luc_intensity), max(dist_luc$luc_intensity), length.out = 30),
+  ur_f = factor(1), province_f = factor(1)
 )
 
-# Generate predictions for each quintile
-preds <- tibble()
-for (q in 1:5) {
-  pred_data <- pred_grid %>% filter(quintile == q) %>%
-    mutate(quintile_f = factor(q))
-  
-  pred_vals <- predict(models_by_quintile[[q]],
-                       newdata = pred_data %>% select(-quintile),
-                       se.fit = FALSE)
-  
-  # Get baseline prediction at 0% LUC
-  baseline_data <- pred_data %>% slice(1) %>% mutate(luc_intensity = 0)
-  baseline_val <- predict(models_by_quintile[[q]],
-                          newdata = baseline_data %>% select(-quintile),
-                          se.fit = FALSE)[1]
-  
-  preds <- bind_rows(preds,
-                     pred_data %>%
-                       mutate(
-                         quintile_label = c("Q1 (Poorest)", "Q2", "Q3 (Middle)", "Q4", "Q5 (Richest)")[q],
-                         predicted_log_food = pred_vals,
-                         predicted_food = exp(pred_vals),
-                         baseline_food = exp(baseline_val),
-                         pct_change = ((exp(pred_vals) - exp(baseline_val)) / exp(baseline_val)) * 100
-                       )
-  )
-}
+preds <- map2_dfr(models_by_quintile, names(models_by_quintile), function(m, q) {
+  pred_grid %>%
+    mutate(
+      quintile = paste0("Q", q),
+      predicted_log_food = predict(m, newdata = pred_grid),
+      predicted_food = exp(predicted_log_food)
+    )
+})
 
-p2_pred <- ggplot(preds, aes(x = luc_intensity, y = pct_change, color = quintile_label, linetype = quintile_label)) +
-  geom_line(size = 1.2) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50", size = 0.5) +
+p2_pred <- ggplot(preds, aes(x = luc_intensity, y = predicted_food,
+                             color = quintile, linetype = quintile)) +
+  geom_line(linewidth = 0.9) +
   scale_color_manual(
-    values = c(
-      "Q1 (Poorest)" = "#e74c3c",
-      "Q2" = "#e59866",
-      "Q3 (Middle)" = "#f9e79f",
-      "Q4" = "#a9dfbf",
-      "Q5 (Richest)" = "#52be80"
-    ),
-    name = "Wealth Quintile"
+    values = c("Q1" = "black", "Q2" = "grey25", "Q3" = "grey45",
+               "Q4" = "grey65", "Q5" = "grey85"),
+    name = "Wealth quintile"
   ) +
   scale_linetype_manual(
-    values = c(
-      "Q1 (Poorest)" = "solid",
-      "Q2" = "solid",
-      "Q3 (Middle)" = "dashed",
-      "Q4" = "solid",
-      "Q5 (Richest)" = "solid"
-    ),
-    guide = "none"
+    values = c("Q1" = "solid", "Q2" = "dashed", "Q3" = "dotted",
+               "Q4" = "dotdash", "Q5" = "longdash"),
+    name = "Wealth quintile"
   ) +
-  labs(
-    title = "Effect of LUC Intensity on Food Consumption by Wealth",
-    subtitle = "Percentage change from 0% LUC baseline (controlling for urban/rural and province)",
-    x = "District LUC Intensity (%)",
-    y = "% Change in Food Consumption",
-    caption = "Poorest (Q1) lose ~5% for every 10% increase in LUC; richest (Q5) unaffected"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 12),
-    plot.subtitle = element_text(size = 10, color = "gray40"),
-    axis.title = element_text(size = 10),
-    legend.position = "right"
+  labs(x = "District LUC intensity (%)",
+       y = "Predicted food consumption per adult equiv. (RWF)") +
+  theme_paper
+
+ggsave(file.path(output_figures_path, "fig2_predicted_consumption_by_quintile.png"), p2_pred,
+       width = 8, height = 5.5, dpi = 300)
+
+# ============================================================
+# FIGURE 3: PRIMARY RESULT. Household-level crop concentration
+# effect, moderated by district-level LUC intensity.
+# Grey shade AND linetype both map to district context.
+# ============================================================
+
+extension_data <- readRDS(file.path(processed_path, "extension_data.rds"))
+model_ext_main <- lm_robust(
+  log_food_ae ~ crop_hhi_c * luc_intensity_c + quintile_f + ur_f + province_f,
+  data = extension_data, clusters = district_code
+)
+
+luc_levels <- quantile(extension_data$luc_intensity_c, c(0.1, 0.5, 0.9), na.rm = TRUE)
+
+ext_pred_grid <- expand_grid(
+  crop_hhi_c = seq(min(extension_data$crop_hhi_c), max(extension_data$crop_hhi_c), length.out = 30),
+  luc_intensity_c = luc_levels,
+  quintile_f = factor(levels(extension_data$quintile_f)[1], levels = levels(extension_data$quintile_f)),
+  ur_f = factor(levels(extension_data$ur_f)[1], levels = levels(extension_data$ur_f)),
+  province_f = factor(levels(extension_data$province_f)[1], levels = levels(extension_data$province_f))
+) %>%
+  mutate(
+    luc_label = factor(case_when(
+      luc_intensity_c == luc_levels[1] ~ "Low-LUC district",
+      luc_intensity_c == luc_levels[2] ~ "Median-LUC district",
+      luc_intensity_c == luc_levels[3] ~ "High-LUC district"
+    ), levels = c("Low-LUC district", "Median-LUC district", "High-LUC district")),
+    predicted_log_food = predict(model_ext_main, newdata = .),
+    predicted_food = exp(predicted_log_food)
   )
 
-ggsave(file.path(output_figures_path, "11_predicted_consumption_by_quintile_pct.png"),
-       p2_pred, width = 10, height = 6, dpi = 300)
+p3_extension <- ggplot(ext_pred_grid, aes(x = crop_hhi_c, y = predicted_food,
+                                          color = luc_label, linetype = luc_label)) +
+  geom_line(linewidth = 0.9) +
+  scale_color_manual(
+    values = c("Low-LUC district" = "grey70",
+               "Median-LUC district" = "grey40",
+               "High-LUC district" = "black"),
+    name = "District context"
+  ) +
+  scale_linetype_manual(
+    values = c("Low-LUC district" = "solid", "Median-LUC district" = "dashed",
+               "High-LUC district" = "dotted"),
+    name = "District context"
+  ) +
+  labs(x = "Household crop concentration (centered HHI)",
+       y = "Predicted food consumption per adult equiv. (RWF)") +
+  theme_paper
 
-print(p2_pred)
+ggsave(file.path(output_figures_path, "fig3_crop_hhi_by_luc.png"), p3_extension,
+       width = 8, height = 5.5, dpi = 300)
 
 
-cat("All visualizations saved to", output_figures_path, "\n")
+# ============================================================
+# Generate the results table directly in R -- reproducible, and
+# avoids hand-transcribing coefficients into LaTeX.
+# ============================================================
+library(modelsummary)
+library(kableExtra)
+
+models_list <- list(
+  "Main + interaction (LUC)" = model_ext_main,
+  "Quintile interaction"     = model_ext_hhi_quintile,
+  "Wealth-group interaction" = model_wealth_interaction
+)
+
+# Use a plain-text placeholder instead of literal LaTeX -- kableExtra
+# will escape it safely as plain text, and we swap it for the real
+# $\times$ symbol afterward, once escaping has already happened.
+cm <- c(
+  "crop_hhi_c:luc_intensity_c" = "crop_hhi_c TIMES luc_intensity_c",
+  "crop_hhi:quintile_f2" = "crop_hhi TIMES quintile_f2",
+  "crop_hhi:quintile_f3" = "crop_hhi TIMES quintile_f3",
+  "crop_hhi:quintile_f4" = "crop_hhi TIMES quintile_f4",
+  "crop_hhi:quintile_f5" = "crop_hhi TIMES quintile_f5",
+  "wealth_groupWealthier (Q3-Q5)" = "wealth_group: Wealthier",
+  "crop_hhi_c:wealth_groupWealthier (Q3-Q5)" = "crop_hhi_c TIMES wealth_group"
+)
+
+modelsummary(
+  models_list,
+  output   = file.path(output_tables_path, "extension_results.tex"),
+  coef_map = c(cm, setNames(names(coef(model_ext_main)), names(coef(model_ext_main)))),
+  coef_omit = "province_f",
+  gof_omit  = "Log.Lik|F|RMSE",
+  stars = TRUE,
+  title = "Household-Level Crop Concentration and Food Consumption",
+  add_rows = data.frame(term = "Province FE", m1 = "Yes", m2 = "Yes", m3 = "Yes"),
+  notes = c(
+    "Standard errors clustered by district in parentheses. Columns 1 and 3 use crop_hhi centred on its sample mean; Column 2 uses the uncentred variable, so its crop_hhi coefficient reflects the effect within Q1 (the reference quintile) only. Wealthier refers to the Q3-Q5 group, with poorer (Q1-Q2) as the reference category.",
+    "Source: EICV7 (2023/24) and AHS (2024), NISR."
+  )
+)
+
+# ---- Automated post-processing: fixes kableExtra's escaping of our
+# placeholders, adds \label{}, wraps the table in \resizebox, and
+# fixes small labelling quirks. Re-run this whole block any time the
+# models change -- no manual Overleaf edits ever needed. ----
+tex_path <- file.path(output_tables_path, "extension_results.tex")
+tex <- paste(readLines(tex_path, warn = FALSE), collapse = "\n")
+
+tex <- gsub("TIMES", "$\\times$", tex, fixed = TRUE)
+tex <- gsub("Source: EICV7", "\\textit{Source:} EICV7", tex, fixed = TRUE)
+tex <- gsub("district_code", "district", tex, fixed = TRUE)
+
+tex <- sub(
+  "\\caption{Household-Level Crop Concentration and Food Consumption}",
+  "\\caption{Household-Level Crop Concentration and Food Consumption}\n\\label{tab:extension}",
+  tex, fixed = TRUE
+)
+
+tex <- sub("\\begin{tabular}", "\\resizebox{\\textwidth}{!}{%\n\\begin{tabular}", tex, fixed = TRUE)
+tex <- sub("\\end{tabular}", "\\end{tabular}%\n}", tex, fixed = TRUE)
+
+writeLines(tex, tex_path)
+message("Table generated and fixed: ", tex_path)
+
+
+message("All figures saved")
+
 

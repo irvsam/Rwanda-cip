@@ -1,27 +1,26 @@
 # ============================================================
 # 00_setup.R
-# Libraries, paths, options. 
+# Libraries, paths, options.
 # ============================================================
-
-# Loading necessary libraries
 
 library(haven)
 library(tidyverse)
 library(labelled)
 library(sf)
+library(terra)
 library(geodata)
 library(modelsummary)   # regression tables (alt: stargazer)
 library(pandoc)
+library(estimatr)       # lm_robust(), clustered SEs
+library(lme4)           # multilevel model cross-check
 
-data_path   <- "data/raw"
-processed_path <- "data/preprocessed" 
-output_path <- "output"
-
-if (!dir.exists(output_path)) dir.create(output_path)
-if (!dir.exists(file.path(output_path, "figures"))) dir.create(file.path(output_path, "figures"))
-if (!dir.exists(file.path(output_path, "tables")))  dir.create(file.path(output_path, "tables"))
+data_path      <- "data/raw"
+processed_path <- "data/preprocessed"
+output_path    <- "output"
 
 output_figures_path <- file.path(output_path, "figures")
 output_tables_path  <- file.path(output_path, "tables")
 
-
+for (p in c(processed_path, output_path, output_figures_path, output_tables_path)) {
+  if (!dir.exists(p)) dir.create(p, recursive = TRUE)
+}
