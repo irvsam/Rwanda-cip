@@ -205,15 +205,13 @@ ggsave(file.path(output_figures_path, "fig3_crop_hhi_by_luc.png"), p3_extension,
 library(modelsummary)
 library(kableExtra)
 
+
 models_list <- list(
   "Main + interaction (LUC)" = model_ext_main,
   "Quintile interaction"     = model_ext_hhi_quintile,
   "Wealth-group interaction" = model_wealth_interaction
 )
 
-# Use a plain-text placeholder instead of literal LaTeX -- kableExtra
-# will escape it safely as plain text, and we swap it for the real
-# $\times$ symbol afterward, once escaping has already happened.
 cm <- c(
   "crop_hhi_c:luc_intensity_c" = "crop_hhi_c TIMES luc_intensity_c",
   "crop_hhi:quintile_f2" = "crop_hhi TIMES quintile_f2",
@@ -226,29 +224,30 @@ cm <- c(
 
 modelsummary(
   models_list,
-  output   = file.path(output_tables_path, "extension_results.tex"),
-  coef_map = c(cm, setNames(names(coef(model_ext_main)), names(coef(model_ext_main)))),
+  output    = file.path(output_tables_path, "extension_results.tex"),
+  coef_rename = cm,
   coef_omit = "province_f",
   gof_omit  = "Log.Lik|F|RMSE",
   stars = TRUE,
   title = "Household-Level Crop Concentration and Food Consumption",
   add_rows = data.frame(term = "Province FE", m1 = "Yes", m2 = "Yes", m3 = "Yes"),
+  # Use a plain-text placeholder for "crop_hhi" too -- notes text is
+  # NOT auto-escaped, so any underscore or backslash here causes
+  # problems. Swap it for the real name in post-processing instead.
   notes = c(
-    "Standard errors clustered by district in parentheses. Columns 1 and 3 use crop_hhi centred on its sample mean; Column 2 uses the uncentred variable, so its crop_hhi coefficient reflects the effect within Q1 (the reference quintile) only. Wealthier refers to the Q3-Q5 group, with poorer (Q1-Q2) as the reference category.",
+    "Standard errors clustered by district in parentheses. Columns 1 and 3 use CROPHHI centred on its sample mean; Column 2 uses the uncentred variable, so its CROPHHI coefficient reflects the effect within Q1 (the reference quintile) only. Wealthier refers to the Q3-Q5 group, with poorer (Q1-Q2) as the reference category.",
     "Source: EICV7 (2023/24) and AHS (2024), NISR."
   )
 )
 
-# ---- Automated post-processing: fixes kableExtra's escaping of our
-# placeholders, adds \label{}, wraps the table in \resizebox, and
-# fixes small labelling quirks. Re-run this whole block any time the
-# models change -- no manual Overleaf edits ever needed. ----
+# ---- Automated post-processing ----
 tex_path <- file.path(output_tables_path, "extension_results.tex")
 tex <- paste(readLines(tex_path, warn = FALSE), collapse = "\n")
 
 tex <- gsub("TIMES", "$\\times$", tex, fixed = TRUE)
+tex <- gsub("CROPHHI", "crop\\_hhi", tex, fixed = TRUE)
 tex <- gsub("Source: EICV7", "\\textit{Source:} EICV7", tex, fixed = TRUE)
-tex <- gsub("district_code", "district", tex, fixed = TRUE)
+tex <- gsub("district\\_code", "district", tex, fixed = TRUE)
 
 tex <- sub(
   "\\caption{Household-Level Crop Concentration and Food Consumption}",
@@ -261,8 +260,6 @@ tex <- sub("\\end{tabular}", "\\end{tabular}%\n}", tex, fixed = TRUE)
 
 writeLines(tex, tex_path)
 message("Table generated and fixed: ", tex_path)
-
-
-message("All figures saved")
+message("All figures and tables generated successfully.")
 
 
