@@ -32,7 +32,7 @@ sas_c <- clean_sas(sas_c)
 process_sas_season <- function(df, season_label) {
   # Filter to agricultural plots (s2q6 == 96) with a valid LUC
   # response (s2q12), group by district (s1q2), and compute the
-  # population-weighted share of agricultural land under LUC.
+  # area-weighted share of agricultural land under LUC.
   df %>%
     filter(as.numeric(s2q6) == 96) %>%
     filter(!is.na(s2q12)) %>%

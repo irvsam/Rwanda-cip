@@ -1,6 +1,5 @@
 # ============================================================
 # 04a_build_analysis_data.R
-
 # Builds the master file: one row per EICV7 household.
 #
 #   - Base, outcome and household size: EICV7 poverty file
@@ -43,22 +42,34 @@ any_yes <- function(x) {
   if (all(is.na(x))) NA_integer_ else as.integer(any(x == YES_CODE, na.rm = TRUE))
 }
 
-# Collapses s4aq3 (highest diploma) into four groups by code:
-#   1        Primary school certificate
-#   2-9      Post-primary, EMA/ENTA, O level, A3, A2, TVET III-V
-#   10-15    A1 diplomas, Bachelor, Postgraduate diploma, Masters, PhD
-#   16 / NA  None (also covers heads who attended but hold no certificate)
-#   99       Do not know -> NA
+# Collapses s1 education into five groups:
+#   Never attended            s4aq1 = No
+#   Attended, no certificate  attended, s4aq3 missing or 16 (None)
+#   Primary                   s4aq3 = 1
+#   Secondary or TVET         s4aq3 = 2-9 (post-primary, EMA/ENTA, O level,
+#                             A3, A2, TVET III-V)
+#   Tertiary                  s4aq3 = 10-15 (A1 diplomas up to PhD)
+#   s4aq3 = 99 (Do not know) -> NA
+# Tertiary is small; merge it into "Secondary or TVET" if it causes
+# estimation problems.
 collapse_educ <- function(ever_school, diploma_code) {
   case_when(
-    ever_school != EVER_SCHOOL_YES             ~ "No certificate",
+    ever_school != EVER_SCHOOL_YES             ~ "Never attended",
     diploma_code == 99                         ~ NA_character_,
-    is.na(diploma_code) | diploma_code == 16   ~ "No certificate",
+    is.na(diploma_code) | diploma_code == 16   ~ "Attended, no certificate",
     diploma_code == 1                          ~ "Primary",
     diploma_code %in% 2:9                      ~ "Secondary or TVET",
     diploma_code %in% 10:15                    ~ "Tertiary"
   )
 }
+
+EDUC_LEVELS <- c("Never attended", "Attended, no certificate", "Primary",
+                 "Secondary or TVET", "Tertiary")
+
+# CIP priority crops (codes as in the SAS crop list; check they match the
+# AHS labels printed by 01b): maize, paddy rice, wheat, bush bean,
+# climbing bean, Irish potato, soybean, cassava, small red bean
+PRIORITY_CROPS <- c(101, 102, 104, 106, 107, 110, 122, 130, 305)
 
 # ============================================================
 # Step 1: base (EICV7 poverty file)
@@ -137,8 +148,7 @@ hh_head <- heads %>%
     head_female = as.integer(sex == FEMALE_CODE),
     head_age    = age,
     head_educ   = factor(collapse_educ(ever_school, diploma),
-                         levels = c("No certificate", "Primary",
-                                    "Secondary or TVET", "Tertiary")),
+                         levels = EDUC_LEVELS),
     head_diploma_raw = diploma_lab
   )
 
@@ -220,9 +230,13 @@ hh_crops <- crops_A %>%
   group_by(hhid, crop) %>%                 # same crop on several plots is summed
   summarise(crop_area = sum(crop_area), .groups = "drop_last") %>%
   mutate(share = crop_area / sum(crop_area)) %>%
-  summarise(crop_hhi = sum(share^2),
-            n_crops  = n(),
-            .groups  = "drop")
+  summarise(crop_hhi   = sum(share^2),
+            n_crops    = n(),
+            # share of Season A crop area under CIP priority crops
+            prio_share = sum(crop_area[crop %in% PRIORITY_CROPS]) / sum(crop_area),
+            # is the household's largest crop a priority crop?
+            top_crop_prio = as.integer(crop[which.max(crop_area)] %in% PRIORITY_CROPS),
+            .groups    = "drop")
 
 hh_area_A <- crops_A %>%
   distinct(hhid, row_id, area_sqm) %>%     # each plot counted once
@@ -276,7 +290,7 @@ master <- base %>%
   left_join(dist_luc_join, by = "district_code") %>%
   mutate(
     in_ahs     = !is.na(crop_hhi),
-    log_land   = if_else(land_ha > 0, log(land_ha), NA_real_),
+    log_land   = log(pmax(land_ha, 0.001)),   # floor at 0.001 ha (one household)
     ur_f       = factor(ur),
     province_f = factor(province)
   )
@@ -290,7 +304,7 @@ cat("\nPrimary (AHS) sample:", sum(master$in_ahs), "households\n")
 cat("\nMissing values within the AHS sample:\n")
 master %>%
   filter(in_ahs) %>%
-  summarise(across(c(log_food_ae_real, crop_hhi, luc_intensity, log_land,
+  summarise(across(c(log_food_ae_real, crop_hhi, prio_share, luc_intensity, log_land,
                      hh_size, dep_ratio, head_age, head_female, head_educ,
                      wt_ahs), ~ sum(is.na(.x)))) %>%
   pivot_longer(everything(), names_to = "variable", values_to = "n_missing") %>%
@@ -311,3 +325,5 @@ cat("Correlation of HHI with cooperative membership (proxy check):",
     round(cor(master$crop_hhi, master$coop, use = "complete.obs"), 3), "\n")
 
 saveRDS(master, file.path(processed_path, "master.rds"))
+
+

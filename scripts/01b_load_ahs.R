@@ -1,6 +1,6 @@
 # ============================================================
 # 01b_load_ahs.R
-# Load the raw AHS 2024 files 
+# Load the raw AHS 2024 files used to build the master file.
 #
 #   ahs_s1  : household members (head characteristics, composition)
 #   ahs_s2  : land tenure (total agricultural land, AHS weight)
@@ -9,7 +9,7 @@
 #
 # Also checks that AHS households match EICV7 on hhid, and prints
 # the value labels behind the codes used in 04. Read these before
-# running 04
+# running 04 and correct the codes block there if needed.
 # ============================================================
 
 source("scripts/00_setup.R")
@@ -45,3 +45,4 @@ print(val_labels(ahs_s1$s4aq3))   # highest diploma: used to collapse education
 print(val_labels(ahs_s34$Season)) # which code is Season A?
 print(val_labels(ahs_s2$s2q2a))   # plot land use: what are 96 and 99?
 print(val_labels(ahs_s6$s6q10))   # cooperative membership: which is "yes"?
+print(val_labels(ahs_s34$s3_q4_1)) # crop codes: do they match the SAS list (101 maize etc.)?
