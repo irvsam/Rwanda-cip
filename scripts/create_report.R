@@ -1,4 +1,4 @@
-library(tinytex)
+
 
 main <- "main.tex"
 base <- tools::file_path_sans_ext(main)

@@ -13,6 +13,9 @@ library(modelsummary)   # regression tables (alt: stargazer)
 library(pandoc)
 library(estimatr)       # lm_robust(), clustered SEs
 library(lme4)           # multilevel model cross-check
+library(modelsummary)
+library(tinytex)
+library(kableExtra)
 
 data_path      <- "data/raw"
 processed_path <- "data/preprocessed"

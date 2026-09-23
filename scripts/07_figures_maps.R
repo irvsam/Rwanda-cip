@@ -202,8 +202,7 @@ ggsave(file.path(output_figures_path, "fig3_crop_hhi_by_luc.png"), p3_extension,
 # Generate the results table directly in R -- reproducible, and
 # avoids hand-transcribing coefficients into LaTeX.
 # ============================================================
-library(modelsummary)
-library(kableExtra)
+
 
 
 models_list <- list(
