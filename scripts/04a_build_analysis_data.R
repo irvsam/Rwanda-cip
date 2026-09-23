@@ -1,6 +1,8 @@
 # ============================================================
 # 04a_build_analysis_data.R
 # Builds the master file: one row per EICV7 household.
+# Diet measures are added afterwards by 04b_build_diet.R, so
+# always rerun 04b after this script.
 #
 #   - Base, outcome and household size: EICV7 poverty file
 #   - Head characteristics, composition: AHS Section 1
@@ -13,8 +15,8 @@
 # variables (all built from consumption, so not valid controls).
 # ============================================================
 
-source("scripts/00_setup.R")
-if (!exists("poverty_data")) source("scripts/01_load_eicv7.R")
+if (!exists(".setup_done"))  source("scripts/00_setup.R")
+if (!exists("poverty_data")) source("scripts/01a_load_eicv7.R")
 if (!exists("ahs_s1"))       source("scripts/01b_load_ahs.R")
 dist_luc <- readRDS(file.path(processed_path, "dist_luc.rds"))
 
@@ -26,15 +28,7 @@ EVER_SCHOOL_YES <- 1  # s4aq1: ever attended school = Yes
 SEASON_A_CODE   <- 1  # Season: Season A
 YES_CODE        <- 1  # Section 6 yes/no questions (2 = No)
 
-# ---- Helpers -----------------------------------------------
-id_num <- function(x) as.numeric(zap_labels(x))
-
-check_unique <- function(df, name) {
-  n_dup <- sum(duplicated(df$hhid))
-  if (n_dup > 0) stop(name, ": ", n_dup, " duplicated hhid values")
-  message(name, ": ", nrow(df), " households, hhid unique")
-}
-
+# ---- Helpers (id_num and check_unique live in 00_setup.R) ----
 # 1 if any row for the household answered yes, 0 if all answered,
 # NA if the household never answered
 any_yes <- function(x) {
@@ -66,8 +60,7 @@ collapse_educ <- function(ever_school, diploma_code) {
 EDUC_LEVELS <- c("Never attended", "Attended, no certificate", "Primary",
                  "Secondary or TVET", "Tertiary")
 
-# CIP priority crops (codes as in the SAS crop list; check they match the
-# AHS labels printed by 01b): maize, paddy rice, wheat, bush bean,
+# CIP priority crops (SAS crop codes, confirmed against the AHS labels): maize, paddy rice, wheat, bush bean,
 # climbing bean, Irish potato, soybean, cassava, small red bean
 PRIORITY_CROPS <- c(101, 102, 104, 106, 107, 110, 122, 130, 305)
 
@@ -266,10 +259,9 @@ programmes <- ahs_s6 %>%
 check_unique(programmes, "Step 5 programmes")
 
 # ============================================================
-# Step 6: district LUC intensity
-# TODO: rebuild dist_luc in the SAS script as an area-weighted share
-#   sum(area x weight x consolidated) / sum(area x weight)
-# over agricultural plots, and add a Season A only version.
+# Step 6: district LUC intensity (built in 03_build_luc.R)
+#   area-weighted share of agricultural land under consolidation,
+#   in percentage points; luc_intensity_A = Season A only
 # ============================================================
 
 dist_luc_join <- dist_luc %>% select(district_code, luc_intensity, luc_intensity_A)
@@ -299,6 +291,7 @@ check_unique(master, "Master")
 stopifnot(nrow(master) == nrow(base))
 
 # ---- Final checks -------------------------------------------
+# (coop is a proxy check only; it is never used as a control)
 cat("\nPrimary (AHS) sample:", sum(master$in_ahs), "households\n")
 
 cat("\nMissing values within the AHS sample:\n")
@@ -325,5 +318,3 @@ cat("Correlation of HHI with cooperative membership (proxy check):",
     round(cor(master$crop_hhi, master$coop, use = "complete.obs"), 3), "\n")
 
 saveRDS(master, file.path(processed_path, "master.rds"))
-
-

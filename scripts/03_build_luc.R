@@ -1,12 +1,15 @@
 # ============================================================
 # 03_build_luc.R
 # Construct the district-level LUC intensity variable from
-# SAS 2024: population-weighted share of agricultural land under
-# consolidation, averaged across Seasons A, B, C.
-
+# SAS 2024: area-weighted share of agricultural land under
+# consolidation (plot area x SAS plot weight, NISR SAS metadata
+# handbook), in percentage points.
+#   luc_intensity   : mean of Seasons A, B and C (primary moderator)
+#   luc_intensity_A : Season A only, matching the AHS crop season
+# Also caches the district boundary shapefile for the map in 07.
 # ============================================================
 
-source("scripts/00_setup.R")
+if (!exists(".setup_done")) source("scripts/00_setup.R")
 
 # Only the Screening files are used (they carry the LUC response,
 # s2q12, and plot size/weight needed to build the intensity measure).
@@ -35,6 +38,7 @@ process_sas_season <- function(df, season_label) {
     filter(!is.na(s2q12)) %>%
     group_by(s1q2) %>%
     summarise(
+      .groups = "drop",
       total_ha_est = sum(Plot_size_ha * plot_weight, na.rm = TRUE),
       luc_ha_est   = sum((Plot_size_ha * plot_weight)[as.numeric(s2q12) == 1], na.rm = TRUE)
     ) %>%
@@ -61,8 +65,8 @@ dist_luc <- bind_rows(
 
 stopifnot(!any(is.na(dist_luc$luc_intensity_A)))  # every district has Season A
 
-summary(dist_luc$luc_intensity)
-stopifnot(nrow(dist_luc) == 30)  # sanity check: all 30 districts present
+stopifnot(nrow(dist_luc) == 30)  # all 30 districts present
+print(summary(dist_luc$luc_intensity))
 
 saveRDS(dist_luc, file.path(processed_path, "dist_luc.rds"))
 

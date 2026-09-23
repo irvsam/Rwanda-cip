@@ -7,13 +7,13 @@
 #   ahs_s34 : crops grown, by plot and season (crop concentration)
 #   ahs_s6  : extension services and programmes (proxy validation)
 #
-# Also checks that AHS households match EICV7 on hhid, and prints
-# the value labels behind the codes used in 04. Read these before
-# running 04 and correct the codes block there if needed.
+# Also checks that AHS households match EICV7 on hhid. With
+# CHECK_LABELS = TRUE (set in 00_setup.R or before sourcing), it
+# prints the value labels behind the codes used in 04a.
 # ============================================================
 
-source("scripts/00_setup.R")
-if (!exists("poverty_data")) source("scripts/01_load_eicv7.R")
+if (!exists(".setup_done"))  source("scripts/00_setup.R")
+if (!exists("poverty_data")) source("scripts/01a_load_eicv7.R")
 
 ahs_dir <- file.path(data_path, "AHS 2024")
 
@@ -34,15 +34,19 @@ join_check <- imap_dfr(
   }
 )
 print(join_check)
-# Expect roughly 3,700 households per file, nearly all matched.
+# Expected: 3,724 households (3,717 in s34), all matched
 
-# ---- Codes to confirm before running 04 --------------------
-print(val_labels(ahs_s1$s1q2))    # relationship to head: which is "head"?
-print(val_labels(ahs_s1$s1q1))    # sex: which is "female"?
-print(val_labels(ahs_s1$s1q14))   # household membership: which codes are current members?
-print(val_labels(ahs_s1$s4aq1))   # ever attended school: which is "yes"?
-print(val_labels(ahs_s1$s4aq3))   # highest diploma: used to collapse education
-print(val_labels(ahs_s34$Season)) # which code is Season A?
-print(val_labels(ahs_s2$s2q2a))   # plot land use: what are 96 and 99?
-print(val_labels(ahs_s6$s6q10))   # cooperative membership: which is "yes"?
-print(val_labels(ahs_s34$s3_q4_1)) # crop codes: do they match the SAS list (101 maize etc.)?
+# ---- Codes behind 04a (confirmed; print only when checking) ----
+if (isTRUE(CHECK_LABELS)) {
+  print(val_labels(ahs_s1$s1q2))    # relationship to head: which is "head"?
+  print(val_labels(ahs_s1$s1q1))    # sex: which is "female"?
+  print(val_labels(ahs_s1$s1q14))   # household membership: which codes are current members?
+  print(val_labels(ahs_s1$s4aq1))   # ever attended school: which is "yes"?
+  print(val_labels(ahs_s1$s4aq3))   # highest diploma: used to collapse education
+  print(val_labels(ahs_s34$Season)) # which code is Season A?
+  print(val_labels(ahs_s2$s2q2a))   # plot land use: what are 96 and 99?
+  print(val_labels(ahs_s6$s6q10))   # cooperative membership: which is "yes"?
+  print(val_labels(ahs_s34$s3_q4_1)) # crop codes: do they match the SAS list (101 maize etc.)?
+}
+
+message("AHS loaded")

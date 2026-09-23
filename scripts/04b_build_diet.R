@@ -21,14 +21,9 @@
 # units with farmer-stated prices, so value shares add error.
 # ============================================================
 
-source("scripts/00_setup.R")
+if (!exists(".setup_done")) source("scripts/00_setup.R")
+if (!exists("food"))        source("scripts/01a_load_eicv7.R")   # trimmed S8B
 
-# Only the columns needed: ID, item, and the consumed / purchased /
-# own-produced flags for visits 2-5 (cuts memory use by ~80%)
-food <- read_dta(
-  file.path(data_path, "EICV7/CS_S8B_Food_Expenditure_Consumption.dta"),
-  col_select = c(hhid, s8bq0, matches("^s8bq(2|6|9)_v[2-5]$"))
-)
 master <- readRDS(file.path(processed_path, "master.rds"))
 
 YES <- 1   # s8bq2 / s8bq6 / s8bq9: 1 = Yes, 2 = No (confirmed)
@@ -94,8 +89,8 @@ items <- food %>%
   filter(!item %in% EXCLUDED_ITEMS) %>%
   left_join(item_map, by = "item")
 
-cat("Item rows per household (should be 148 for all):\n")
-print(count(count(food, hhid), n))
+rows_per_hh <- count(food, hhid)
+stopifnot(all(rows_per_hh$n == 148))   # every household asked all 148 items
 
 # ---- Household-level measures --------------------------------
 diet <- items %>%
@@ -124,7 +119,7 @@ stopifnot(!any(duplicated(diet$hhid)))
 cat("\nDiet measures built for", nrow(diet), "households\n")
 
 # ---- Checks --------------------------------------------------
-cat("\nHDDS distribution (ceiling effects? most households at 11-12?):\n")
+cat("\nHDDS distribution:\n")
 print(count(diet, hdds))
 
 cat("\nNon-staple diversity distribution:\n")

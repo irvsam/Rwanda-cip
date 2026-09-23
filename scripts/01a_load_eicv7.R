@@ -1,31 +1,31 @@
 # ============================================================
-# 01_load_eicv7.R
-# Load the raw EICV7 files
+# 01a_load_eicv7.R
+# Load the raw EICV7 (2023/24, cross-sectional sample) files.
 #
-#   poverty_data  : base of the master file (outcome, adult
-#                   equivalents, price deflator, household size,
-#                   weights, geography)
-#   expenditure_C : S8A3, for the own-production mechanism test
-#                   in 05_main_models.R
+#   poverty_data : base of the master file (food aggregate, adult
+#                  equivalents, price deflator hh_index, household
+#                  size, weights, geography)
+#   food         : S8B food consumption module, one row per
+#                  household x item (15,054 x 148). Only the columns
+#                  used in 04b are read (ID, item, and the consumed /
+#                  purchased / own-produced flags for visits 2-5),
+#                  which cuts memory use by ~80%.
 # ============================================================
 
-source("scripts/00_setup.R")
+if (!exists(".setup_done")) source("scripts/00_setup.R")
 
-poverty_data  <- read_dta(file.path(data_path, "EICV7/CS_EICV7_poverty_file.dta"))
-expenditure_C <- read_dta(file.path(data_path, "EICV7/CS_S8A3_Expenditure.dta"))
+poverty_data <- read_dta(file.path(data_path, "EICV7/CS_EICV7_poverty_file.dta"))
 
-# food takes a while to load because it is a large file (15,054 households × 148 items = 2,227,992 rows)
-# so we select only what is
 food <- read_dta(
   file.path(data_path, "EICV7/CS_S8B_Food_Expenditure_Consumption.dta"),
   col_select = c(hhid, s8bq0, matches("^s8bq(2|6|9)_v[2-5]$"))
 )
 
-# The following are just to see codings for the files
-# print(val_labels(food$s8bq0))      # the 148 item names
-# print(val_labels(food$s8bq6_v2))   # consumed: which code is yes?
-# print(val_labels(food$s8bq2_v2))   # purchased: which code is yes?
-# print(val_labels(food$s8bq9_v2))   # own-produced: which code is yes?
-# print(val_labels(food$s8bq0))
+if (isTRUE(CHECK_LABELS)) {
+  print(val_labels(food$s8bq0))      # the 148 item names
+  print(val_labels(food$s8bq6_v2))   # consumed: 1 = Yes
+  print(val_labels(food$s8bq2_v2))   # purchased: 1 = Yes
+  print(val_labels(food$s8bq9_v2))   # own-produced: 1 = Yes
+}
 
-message("eicv loaded")
+message("EICV7 loaded: ", nrow(poverty_data), " households")
