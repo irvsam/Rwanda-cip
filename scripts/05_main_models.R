@@ -1,141 +1,180 @@
 # ============================================================
-# 05_main_models.R
-# District-level analysis: does LUC intensity affect household food
-# welfare, controlling for wealth -- and is that effect concentrated
-# among poorer households?
+# 05_main_model.R
+# PRIMARY ANALYSIS.
 #
-# This is the SECONDARY / robustness analysis in the final paper
-# structure. The PRIMARY analysis (household-level crop concentration
-# as IV, LUC intensity as moderator) lives in
-# 06_household_crop_concentration.R
-
+# H1: household crop concentration (HHI, Season A) is negatively
+#     associated with food consumption per adult equivalent.
+# H2: that association is stronger in districts with higher LUC
+#     intensity (compounding).
+#
+# Sample: AHS 2024 sub-panel (in_ahs), linked to EICV7 by hhid.
+# All variables are built in 04a_build_analysis_data.R.
+#
+# Outcome: log real food consumption per adult equivalent
+#   (food / ae / hh_index, Jan 2024 prices).
+# Controls: predetermined household characteristics and land held.
+#   The consumption quintile is NOT used: it is built from total
+#   consumption, which contains the outcome.
+# Inference: CR2 cluster-robust SEs by district (lm_robust default).
 # ============================================================
 
 source("scripts/00_setup.R")
-analysis_data <- readRDS(file.path(processed_path, "analysis_data.rds"))
 
-# ---- Naive OLS (unclustered) ----
-model_main_naive <- lm(
-  log_food_ae ~ luc_intensity + quintile_f + ur_f + province_f,
-  data = analysis_data
-)
-summary(model_main_naive)
 
-model_interaction_naive <- lm(
-  log_food_ae ~ luc_intensity * quintile_f + ur_f + province_f,
-  data = analysis_data
-)
-summary(model_interaction_naive)
+master <- readRDS(file.path(processed_path, "master.rds"))
 
-models_by_quintile_naive <- analysis_data %>%
-  group_split(quintile_f) %>%
-  set_names(sort(unique(analysis_data$quintile_f))) %>%
-  map(~ lm(log_food_ae ~ luc_intensity + ur_f + province_f, data = .x))
-
-map(models_by_quintile_naive, summary)
-
-modelsummary(
-  c(list("Main effect" = model_main_naive, "Interaction" = model_interaction_naive),
-    models_by_quintile_naive),
-  output = file.path(output_tables_path, "main_results_naive.docx")
-)
-
-# ---- Clustered version (the correctly-inferred results) ----
-# LUC intensity is measured at the district level, so households
-# within a district are not independent observations with respect
-# to it; clustering by district_code corrects the standard errors.
-model_main <- lm_robust(
-  log_food_ae ~ luc_intensity + quintile_f + ur_f + province_f,
-  data = analysis_data,
-  clusters = district_code
-)
-summary(model_main)
-
-model_interaction <- lm_robust(
-  log_food_ae ~ luc_intensity * quintile_f + ur_f + province_f,
-  data = analysis_data,
-  clusters = district_code
-)
-summary(model_interaction)
-
-models_by_quintile <- analysis_data %>%
-  group_split(quintile_f) %>%
-  set_names(sort(unique(analysis_data$quintile_f))) %>%
-  map(~ lm_robust(
-    log_food_ae ~ luc_intensity + ur_f + province_f,
-    data = .x,
-    clusters = district_code
-  ))
-
-map(models_by_quintile, summary)
-
-modelsummary(
-  c(list("Main effect" = model_main, "Interaction" = model_interaction),
-    models_by_quintile),
-  output = file.path(output_tables_path, "main_results_clustered.docx")
-)
-
-# ============================================================
-# MECHANISM TEST
-# Does LUC intensity affect own-production, an intermediate channel
-# plausibly linking district-level consolidation to reduced food
-# consumption? One pre-specified test, reported regardless of result.
-# ============================================================
-
-if (!exists("expenditure_C")) source("scripts/01_load_eicv7.R")
-
-# Households with zero valid s08a4_4 rows get NA, not -Inf:
-# max(..., na.rm = TRUE) on an all-NA/empty vector silently returns
-# -Inf, which crashes lm_robust()'s underlying C++ code rather than
-# throwing a normal R error.
-own_prod <- expenditure_C %>%
-  select(hhid, s08a4_4) %>%
-  group_by(hhid) %>%
-  summarise(
-    has_own_prod     = if (all(is.na(s08a4_4))) NA_real_
-    else max(as.numeric(s08a4_4) == 1, na.rm = TRUE),
-    n_own_prod_items = sum(as.numeric(s08a4_4) == 1, na.rm = TRUE),
-    n_missing        = sum(is.na(s08a4_4)),
-    .groups = "drop"
+# ---- Estimation sample, centred on that sample ---------------
+primary <- master %>%
+  filter(in_ahs) %>%
+  mutate(
+    crop_hhi_c = crop_hhi - mean(crop_hhi),
+    luc_c      = luc_intensity   - mean(luc_intensity),
+    luc_A_c    = luc_intensity_A - mean(luc_intensity_A)
   )
 
-sum(is.na(own_prod$has_own_prod))  # how many households this affects
+cat("Primary sample:", nrow(primary), "households in",
+    n_distinct(primary$district_code), "districts\n")
 
-mechanism_data <- analysis_data %>%
-  left_join(own_prod, by = "hhid") %>%
-  filter(is.finite(has_own_prod))  # defensive: drop any NA/-Inf/NaN
+# ---- Specifications ------------------------------------------
+# (1) geography only, (2) + household controls, (3) + land = primary
+f_base <- log_food_ae_real ~ crop_hhi_c * luc_c + ur_f + province_f
+f_hh   <- update(f_base, . ~ . + hh_size + dep_ratio + head_age +
+                   head_female + head_educ)
+f_main <- update(f_hh, . ~ . + log_land)
 
-nrow(mechanism_data)
+fit <- function(f, data = primary, ...) {
+  lm_robust(f, data = data, clusters = district_code, ...)
+}
 
-model_mech_binary <- lm_robust(
-  has_own_prod ~ luc_intensity + quintile_f + ur_f + province_f,
-  data = mechanism_data,
-  clusters = district_code
+main_models <- list(
+  "(1) Geography"          = fit(f_base),
+  "(2) + Household"        = fit(f_hh),
+  "(3) + Land (primary)"   = fit(f_main)
 )
-summary(model_mech_binary)
+map(main_models, summary)
 
-model_mech_count <- lm_robust(
-  n_own_prod_items ~ luc_intensity + quintile_f + ur_f + province_f,
-  data = mechanism_data,
-  clusters = district_code
+# ---- Robustness ----------------------------------------------
+# Season A LUC: swap the moderator in a copy of the data so the
+# coefficient rows line up with the primary model in the table.
+primary_A <- primary %>% mutate(luc_c = luc_A_c)
+
+robust_models <- list(
+  "Primary"           = main_models[["(3) + Land (primary)"]],
+  "AHS weights"       = fit(f_main, weights = wt_ahs),
+  "Season A LUC"      = fit(f_main, data = primary_A),
+  "Nominal outcome"   = fit(update(f_main, log_food_ae_nominal ~ .))
 )
-summary(model_mech_count)
+map(robust_models, summary)
 
-mech_models_by_quintile <- mechanism_data %>%
-  group_split(quintile_f) %>%
-  set_names(sort(unique(mechanism_data$quintile_f))) %>%
-  map(~ lm_robust(
-    has_own_prod ~ luc_intensity + ur_f + province_f,
-    data = .x,
-    clusters = district_code
-  ))
+# ---- Marginal effect of HHI across district LUC intensity -----
+# slope(L) = b_hhi + L * b_interaction, with its SE from the
+# cluster-robust vcov. Evaluated at the 10th, 50th and 90th
+# percentiles of LUC across the 30 districts. t critical value uses
+# (clusters - 1) df, a conservative choice with 30 clusters.
+luc_pcts <- primary %>%
+  distinct(district_code, luc_intensity) %>%
+  summarise(p10 = quantile(luc_intensity, 0.10),
+            p50 = quantile(luc_intensity, 0.50),
+            p90 = quantile(luc_intensity, 0.90)) %>%
+  pivot_longer(everything(), names_to = "luc_pctile", values_to = "luc_intensity")
 
-map(mech_models_by_quintile, summary)
+df_clust <- n_distinct(primary$district_code) - 1
+sd_hhi   <- sd(primary$crop_hhi)
+
+hhi_slope_at <- function(model, luc_table, luc_mean, hhi = "crop_hhi_c",
+                         int = "crop_hhi_c:luc_c") {
+  b <- coef(model)
+  V <- vcov(model)
+  luc_table %>%
+    mutate(
+      L        = luc_intensity - luc_mean,
+      slope    = b[hhi] + L * b[int],
+      se       = sqrt(V[hhi, hhi] + L^2 * V[int, int] + 2 * L * V[hhi, int]),
+      conf.low  = slope - qt(0.975, df_clust) * se,
+      conf.high = slope + qt(0.975, df_clust) * se,
+      # % difference in food consumption for a one-SD increase in HHI
+      pct_1sd      = 100 * (exp(slope * sd_hhi) - 1),
+      pct_1sd_low  = 100 * (exp(conf.low * sd_hhi) - 1),
+      pct_1sd_high = 100 * (exp(conf.high * sd_hhi) - 1)
+    )
+}
+
+marginal_effects <- hhi_slope_at(main_models[["(3) + Land (primary)"]],
+                                 luc_pcts, mean(primary$luc_intensity))
+cat("\nSD of HHI:", round(sd_hhi, 3), "\n")
+print(marginal_effects %>%
+        select(luc_pctile, luc_intensity, slope, conf.low, conf.high,
+               pct_1sd, pct_1sd_low, pct_1sd_high),
+      width = Inf)
+
+# ---- Multilevel cross-check: random intercept and random slope -----
+# The random slope for HHI matters: H2 claims the HHI slope varies by
+# district, and a random-intercept-only model with a cross-level
+# interaction tends to understate the interaction's SE
+# (Heisig & Schaeffer, 2019).
+ml_int   <- lmer(update(f_main, . ~ . + (1 | district_code)), data = primary)
+ml_slope <- lmer(update(f_main, . ~ . + (1 + crop_hhi_c | district_code)),
+                 data = primary)
+
+key <- c("crop_hhi_c", "crop_hhi_c:luc_c")
+cat("\nRandom intercept:\n");  print(summary(ml_int)$coefficients[key, ])
+cat("\nRandom slope:\n");      print(summary(ml_slope)$coefficients[key, ])
+cat("\nRandom slope model singular?", isSingular(ml_slope), "\n")
+print(VarCorr(ml_slope))
+
+vc  <- as.data.frame(VarCorr(ml_int))
+icc <- vc$vcov[vc$grp == "district_code"] / sum(vc$vcov)
+cat("ICC (conditional on controls):", round(icc, 3), "\n")
+
+# ---- Tables for the paper ------------------------------------
+coef_labels <- c(
+  "crop_hhi_c"       = "Crop concentration (HHI, centred)",
+  "luc_c"            = "District LUC intensity (pp, centred)",
+  "crop_hhi_c:luc_c" = "HHI x LUC intensity",
+  "log_land"         = "Log agricultural land (ha)",
+  "hh_size"          = "Household size",
+  "dep_ratio"        = "Dependency ratio",
+  "head_age"         = "Head age",
+  "head_female"      = "Female head",
+  "head_educAttended, no certificate" = "Head: attended, no certificate",
+  "head_educPrimary"           = "Head: primary",
+  "head_educSecondary or TVET" = "Head: secondary or TVET",
+  "head_educTertiary"          = "Head: tertiary",
+  "ur_f2"            = "Rural"
+)
+
+table_notes <- paste(
+  "CR2 standard errors clustered by district (30 clusters) in parentheses.",
+  "Outcome: log food consumption per adult equivalent, January 2024 prices.",
+  "All models include province fixed effects. HHI and LUC are centred on",
+  "their sample means. Reference education category: never attended."
+)
 
 modelsummary(
-  c(list("Has own production" = model_mech_binary,
-         "N own-production items" = model_mech_count),
-    mech_models_by_quintile),
-  output = file.path(output_tables_path, "mechanism_results.docx")
-  
+  main_models,
+  coef_map = coef_labels,
+  gof_map  = c("nobs", "r.squared"),
+  stars    = TRUE,
+  title    = "Household crop concentration, district LUC intensity and food consumption",
+  notes    = table_notes,
+  output   = file.path(output_tables_path, "primary_results.tex")
+)
+
+modelsummary(
+  robust_models,
+  coef_map = coef_labels[c("crop_hhi_c", "luc_c", "crop_hhi_c:luc_c")],
+  gof_map  = c("nobs", "r.squared"),
+  stars    = TRUE,
+  title    = "Robustness of the primary specification",
+  notes    = paste(table_notes,
+                   "All columns include the full control set of the primary model."),
+  output   = file.path(output_tables_path, "primary_robustness.tex")
+)
+
+# ---- Save for figures (07) -----------------------------------
+saveRDS(
+  list(primary = primary, main_models = main_models,
+       robust_models = robust_models, marginal_effects = marginal_effects,
+       ml_int = ml_int, ml_slope = ml_slope, icc = icc),
+  file.path(processed_path, "primary_models.rds")
 )

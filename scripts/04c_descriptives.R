@@ -1,5 +1,5 @@
 # ============================================================
-# 04b_descriptives.R
+# 04c_descriptives.R
 # Descriptive statistics for the variables used in the models,
 # for the two estimation samples:
 #   - Primary: AHS sub-panel (household crop concentration x

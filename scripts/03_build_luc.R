@@ -3,10 +3,7 @@
 # Construct the district-level LUC intensity variable from
 # SAS 2024: population-weighted share of agricultural land under
 # consolidation, averaged across Seasons A, B, C.
-#
-# This is the key independent variable in the district-level
-# analysis (05_main_models.R) and, later, the moderator in the
-# household-level extension (06_household_crop_concentration.R).
+
 # ============================================================
 
 source("scripts/00_setup.R")
@@ -56,9 +53,13 @@ dist_luc <- bind_rows(
 ) %>%
   group_by(s1q2) %>%
   summarise(
-    luc_intensity = mean(seasonal_intensity, na.rm = TRUE),
-    district_code = as.numeric(first(s1q2))
+    luc_intensity   = mean(seasonal_intensity, na.rm = TRUE),
+    luc_intensity_A = first(seasonal_intensity[season == "A"]),
+    district_code   = as.numeric(first(s1q2)),
+    .groups = "drop"
   )
+
+stopifnot(!any(is.na(dist_luc$luc_intensity_A)))  # every district has Season A
 
 summary(dist_luc$luc_intensity)
 stopifnot(nrow(dist_luc) == 30)  # sanity check: all 30 districts present

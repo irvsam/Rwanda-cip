@@ -16,6 +16,7 @@ library(lme4)           # multilevel model cross-check
 library(modelsummary)
 library(tinytex)
 library(kableExtra)
+library(lmerTest)   # Satterthwaite p-values for the multilevel check
 
 data_path      <- "data/raw"
 processed_path <- "data/preprocessed"

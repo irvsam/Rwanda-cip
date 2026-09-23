@@ -1,59 +1,27 @@
 \begin{table}
 \centering
 \begin{talltblr}[         %% tabularray outer open
-caption={Household-Level Crop Concentration and Food Consumption},
+caption={District LUC intensity and food consumption, full EICV7 sample},
 note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
-note{ }={Standard errors clustered by district in parentheses. Columns 1 and 3 use crop\_hhi centred on its sample mean; Column 2 uses the uncentred variable, so its crop\_hhi coefficient reflects the effect within Q1 (the reference quintile) only. Wealthier refers to the Q3-Q5 group, with poorer (Q1-Q2) as the reference category.},
-note{  }={\textit{Source:} EICV7 (2023/24) and AHS (2024), NISR.},
+note{ }={CR2 standard errors clustered by district (30 clusters). Outcome: log food consumption per adult equivalent, January 2024 prices. All models include province fixed effects.},
 ]                     %% tabularray outer close
 {                     %% tabularray inner open
 colspec={Q[]Q[]Q[]Q[]},
 hline{2}={1-4}{solid, black, 0.05em},
-hline{34}={1-4}{solid, black, 0.05em},
+hline{8}={1-4}{solid, black, 0.05em},
 hline{1}={1-4}{solid, black, 0.08em},
-hline{41}={1-4}{solid, black, 0.08em},
+hline{10}={1-4}{solid, black, 0.08em},
 column{2-4}={}{halign=c},
 column{1}={}{halign=l},
 }                     %% tabularray inner close
-& Main + interaction (LUC) & Quintile interaction & Wealth-group interaction \\
-(Intercept) & \num{13.869}*** & \num{13.922}*** & \num{14.050}*** \\
-& (\num{0.116}) & (\num{0.112}) & (\num{0.151}) \\
-crop\_hhi\_c & \num{-0.221}** &  & \num{-0.226}** \\
-& (\num{0.072}) &  & (\num{0.085}) \\
-luc\_intensity\_c & \num{-0.005} &  & \num{-0.006} \\
-& (\num{0.004}) &  & (\num{0.004}) \\
-quintile\_f2 & \num{0.239}*** & \num{0.289}*** &  \\
-& (\num{0.026}) & (\num{0.053}) &  \\
-quintile\_f3 & \num{0.391}*** & \num{0.473}*** &  \\
-& (\num{0.029}) & (\num{0.049}) &  \\
-quintile\_f4 & \num{0.527}*** & \num{0.563}*** &  \\
-& (\num{0.027}) & (\num{0.049}) &  \\
-quintile\_f5 & \num{0.850}*** & \num{0.851}*** &  \\
-& (\num{0.042}) & (\num{0.080}) &  \\
-ur\_f2 & \num{-0.172}*** & \num{-0.169}*** & \num{-0.205}*** \\
-& (\num{0.028}) & (\num{0.028}) & (\num{0.032}) \\
-crop\_hhi\_c $\times$ luc\_intensity\_c & \num{-0.016}* &  &  \\
-& (\num{0.006}) &  &  \\
-crop\_hhi &  & \num{-0.127} &  \\
-&  & (\num{0.118}) &  \\
-crop\_hhi $\times$ quintile\_f2 &  & \num{-0.153} &  \\
-&  & (\num{0.141}) &  \\
-crop\_hhi $\times$ quintile\_f3 &  & \num{-0.250}* &  \\
-&  & (\num{0.127}) &  \\
-crop\_hhi $\times$ quintile\_f4 &  & \num{-0.113} &  \\
-&  & (\num{0.129}) &  \\
-crop\_hhi $\times$ quintile\_f5 &  & \num{-0.003} &  \\
-&  & (\num{0.192}) &  \\
-wealth\_group: Wealthier &  &  & \num{0.397}*** \\
-&  &  & (\num{0.022}) \\
-crop\_hhi\_c $\times$ wealth\_group &  &  & \num{-0.025} \\
-&  &  & (\num{0.078}) \\
-Num.Obs. & \num{3697} & \num{3697} & \num{3697} \\
-R2 & \num{0.209} & \num{0.207} & \num{0.141} \\
-R2 Adj. & \num{0.207} & \num{0.204} & \num{0.139} \\
-AIC & \num{5644.1} & \num{5660.1} & \num{5943.1} \\
-BIC & \num{5731.1} & \num{5759.5} & \num{6011.5} \\
-Std.Errors & by: district & by: district & by: district \\
-Province FE & Yes & Yes & Yes \\
+& Full sample & Rural only & EICV7 weights \\
+District LUC intensity (pp) & \num{-0.006}+ & \num{-0.005} & \num{-0.006}+ \\
+& (\num{0.003}) & (\num{0.003}) & (\num{0.004}) \\
+Household size & \num{-0.054}*** & \num{-0.052}*** & \num{-0.055}*** \\
+& (\num{0.003}) & (\num{0.003}) & (\num{0.002}) \\
+Rural & \num{-0.180}*** &  & \num{-0.165}*** \\
+& (\num{0.024}) &  & (\num{0.022}) \\
+Num.Obs. & \num{15054} & \num{11060} & \num{15054} \\
+R2 & \num{0.163} & \num{0.077} & \num{0.166} \\
 \end{talltblr}
 \end{table}

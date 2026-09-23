@@ -272,7 +272,7 @@ check_unique(programmes, "Step 5 programmes")
 # over agricultural plots, and add a Season A only version.
 # ============================================================
 
-dist_luc_join <- dist_luc %>% select(district_code, luc_intensity)
+dist_luc_join <- dist_luc %>% select(district_code, luc_intensity, luc_intensity_A)
 cat("Districts in base not found in dist_luc:",
     setdiff(unique(base$district_code), dist_luc_join$district_code), "\n")
 
