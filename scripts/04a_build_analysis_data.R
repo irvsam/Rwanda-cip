@@ -231,6 +231,8 @@ build_hhi <- function(crops, seasons) {
     mutate(share = crop_area / sum(crop_area)) %>%
     summarise(crop_hhi      = sum(share^2),
               n_crops       = n(),
+              hhi_prio    = sum((share^2)[crop %in% PRIORITY_CROPS]),
+              hhi_nonprio = sum((share^2)[!crop %in% PRIORITY_CROPS]),
               prio_share    = sum(crop_area[crop %in% PRIORITY_CROPS]) / sum(crop_area),
               top_crop_prio = as.integer(crop[which.max(crop_area)] %in% PRIORITY_CROPS),
               .groups = "drop")
@@ -239,6 +241,9 @@ build_hhi <- function(crops, seasons) {
 hh_crops   <- build_hhi(crops_all, c(SEASON_A_CODE, SEASON_B_CODE))   # primary
 hh_crops_A <- build_hhi(crops_all, SEASON_A_CODE) %>%
   select(hhid, crop_hhi_A = crop_hhi)                                 # check
+
+stopifnot(isTRUE(all.equal(hh_crops$crop_hhi,
+                           hh_crops$hhi_prio + hh_crops$hhi_nonprio)))
 
 hh_area <- crops_all %>%
   filter(season %in% c(SEASON_A_CODE, SEASON_B_CODE)) %>%

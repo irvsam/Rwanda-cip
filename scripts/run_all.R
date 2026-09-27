@@ -22,6 +22,7 @@ steps <- c(
   "05_main_models.R",           # food value (distal outcome)  -> primary_models.rds
   "05b_diet_models.R",          # diet outcomes, chain table   -> diet_models.rds
   "05c_village_fe.R",           # village fixed effects        -> village_fe_models.rds
+  "05d_priority_split.R",
   "07_figures_maps.R",          # map and mechanism figure
   "extra.R",
   "tidy_tables.R"                 # final tables for the paper

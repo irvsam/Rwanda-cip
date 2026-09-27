@@ -52,7 +52,23 @@ check_unique <- function(df, name) {
   message(name, ": ", nrow(df), " households, hhid unique")
 }
 
+
+
 # Model helpers (used by 05 and 05b so both use the identical sample, centring, specification and inference)  --------------
+
+# Split: each part of HHI gets its own slope and LUC interaction
+make_f_split <- function(outcome, controls = CONTROLS) {
+  reformulate(c("hhi_prio_c * luc_c", "hhi_nonprio_c * luc_c", controls),
+              response = outcome)
+}
+
+# Same model, reparametrised: the hhi_prio_c coefficient is now the
+# DIFFERENCE between the priority and non-priority slopes, with its own
+# CR2 test
+make_f_diff <- function(outcome, controls = CONTROLS) {
+  reformulate(c("crop_hhi_c * luc_c", "hhi_prio_c * luc_c", controls),
+              response = outcome)
+}
 
 # Primary estimation sample: AHS households, HHI and LUC centred on
 # this sample
@@ -63,7 +79,9 @@ make_primary <- function(master) {
     mutate(
       crop_hhi_c = crop_hhi        - mean(crop_hhi),
       luc_c      = luc_intensity   - mean(luc_intensity),
-      luc_A_c    = luc_intensity_A - mean(luc_intensity_A)
+      luc_A_c    = luc_intensity_A - mean(luc_intensity_A),
+      hhi_prio_c    = hhi_prio    - mean(hhi_prio),
+      hhi_nonprio_c = hhi_nonprio - mean(hhi_nonprio)
     )
 }
 

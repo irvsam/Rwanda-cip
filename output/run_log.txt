@@ -3,7 +3,7 @@
 00_setup.R done in 0 s
 
 ====================  01a_load_eicv7.R  ====================
-01a_load_eicv7.R done in 4.4 s
+01a_load_eicv7.R done in 5.3 s
 
 ====================  01b_load_ahs.R  ====================
 # A tibble: 4 × 4
@@ -13,12 +13,12 @@
 2 s2    23266       3724             3724
 3 s34   32616       3717             3717
 4 s6     9286       3724             3724
-01b_load_ahs.R done in 2.3 s
+01b_load_ahs.R done in 2.4 s
 
 ====================  03_build_luc.R  ====================
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
   0.000   1.649   3.004   3.737   4.888  13.642 
-03_build_luc.R done in 17.8 s
+03_build_luc.R done in 16 s
 
 ====================  04a_build_analysis_data.R  ====================
 Max |cons1ae / hh_index - sol_jan|: 3.967296 
@@ -77,50 +77,52 @@ Correlation, nominal vs real log food per ae: 0.952
 Weighted share female-headed, AHS sample (NISR reports 25.7%): 0.256 
 Correlation of HHI with cooperative membership (proxy check): -0.069 
 NA counts in master:
-# A tibble: 39 × 2
+# A tibble: 41 × 2
    variable            n_missing
    <chr>                   <int>
  1 head_diploma_raw        13858
  2 crop_hhi_A              11357
  3 crop_hhi                11339
  4 n_crops                 11339
- 5 prio_share              11339
- 6 top_crop_prio           11339
- 7 area_max_season_ha      11339
- 8 land_ha                 11337
- 9 log_land                11337
-10 n_members_ahs           11330
-11 n_dep                   11330
-12 n_working               11330
-13 dep_ratio               11330
-14 head_female             11330
-15 head_age                11330
-16 head_educ               11330
-17 wt_ahs                  11330
-18 coop                    11330
-19 contract                11330
-20 crop_ins                11330
-21 hhid                        0
-22 clust                       0
-23 province                    0
-24 district_code               0
-25 ur                          0
-26 ae                          0
-27 hh_size                     0
-28 food                        0
-29 hh_index                    0
-30 wt_eicv                     0
-31 food_ae_nominal             0
-32 food_ae_real                0
-33 log_food_ae_nominal         0
-34 log_food_ae_real            0
-35 luc_intensity               0
-36 luc_intensity_A             0
-37 in_ahs                      0
-38 ur_f                        0
-39 province_f                  0
+ 5 hhi_prio                11339
+ 6 hhi_nonprio             11339
+ 7 prio_share              11339
+ 8 top_crop_prio           11339
+ 9 area_max_season_ha      11339
+10 land_ha                 11337
+11 log_land                11337
+12 n_members_ahs           11330
+13 n_dep                   11330
+14 n_working               11330
+15 dep_ratio               11330
+16 head_female             11330
+17 head_age                11330
+18 head_educ               11330
+19 wt_ahs                  11330
+20 coop                    11330
+21 contract                11330
+22 crop_ins                11330
+23 hhid                        0
+24 clust                       0
+25 province                    0
+26 district_code               0
+27 ur                          0
+28 ae                          0
+29 hh_size                     0
+30 food                        0
+31 hh_index                    0
+32 wt_eicv                     0
+33 food_ae_nominal             0
+34 food_ae_real                0
+35 log_food_ae_nominal         0
+36 log_food_ae_real            0
+37 luc_intensity               0
+38 luc_intensity_A             0
+39 in_ahs                      0
+40 ur_f                        0
+41 province_f                  0
 NA counts in master (AHS sample only):
-# A tibble: 39 × 2
+# A tibble: 41 × 2
    variable            n_missing
    <chr>                   <int>
  1 head_diploma_raw         2523
@@ -150,19 +152,21 @@ NA counts in master (AHS sample only):
 25 wt_ahs                      0
 26 crop_hhi                    0
 27 n_crops                     0
-28 prio_share                  0
-29 top_crop_prio               0
-30 area_max_season_ha          0
-31 coop                        0
-32 contract                    0
-33 crop_ins                    0
-34 luc_intensity               0
-35 luc_intensity_A             0
-36 in_ahs                      0
-37 log_land                    0
-38 ur_f                        0
-39 province_f                  0
-04a_build_analysis_data.R done in 2.9 s
+28 hhi_prio                    0
+29 hhi_nonprio                 0
+30 prio_share                  0
+31 top_crop_prio               0
+32 area_max_season_ha          0
+33 coop                        0
+34 contract                    0
+35 crop_ins                    0
+36 luc_intensity               0
+37 luc_intensity_A             0
+38 in_ahs                      0
+39 log_land                    0
+40 ur_f                        0
+41 province_f                  0
+04a_build_analysis_data.R done in 2.1 s
 
 ====================  04b_build_diet.R  ====================
 Households with no answered consumption items (set to NA): 0 
@@ -226,7 +230,7 @@ Correlation of HDDS with log food per ae (full sample): 0.379
 10 hdds_asf_sd         0.900
 11 purch_share_mean    0.561
 12 purch_share_sd      0.210
-04b_build_diet.R done in 3 s
+04b_build_diet.R done in 2.7 s
 
 ====================  04c_descriptives.R  ====================
  Own-produced food groups Purchased share of consumed items Purchased food groups
@@ -320,7 +324,7 @@ Is concentration concentration in CIP priority crops?
 Correlation of HHI with priority-crop share: 0.419 
 Correlation of HDDS with log food per AE: 0.413 
 AHS households with HDDS = 0: 5 
-04c_descriptives.R done in 0.1 s
+04c_descriptives.R done in 0.2 s
 
 ====================  05_main_models.R  ====================
 Primary sample: 3715 households in 30 districts
@@ -361,7 +365,7 @@ Random-slope model, singular: FALSE
 crop_hhi_c       0.01388929 0.07737980 21.90406 0.179495 0.8591991
 crop_hhi_c:luc_c 0.01254050 0.02408347 20.49532 0.520710 0.6081491
 ICC (conditional on controls): 0.054 
-05_main_models.R done in 1.7 s
+05_main_models.R done in 1.1 s
 
 ====================  05b_diet_models.R  ====================
                      Estimate Std. Error     t value     Pr(>|t|)    CI Lower    CI Upper
@@ -536,7 +540,7 @@ Food groups: change in probability of eating, pp per one-SD HHI
 10  0.847     -0.000539      0.972 
 11  0.733     -0.0158        0.550 
 12  0.108     -0.0150        0.444 
-05b_diet_models.R done in 4.6 s
+05b_diet_models.R done in 3.1 s
 
 ====================  05c_village_fe.R  ====================
 Villages: 581 
@@ -583,10 +587,17 @@ crop_hhi_c:luc_c -0.06635151 0.04483949 -1.4797561 0.1838860 -0.1731060 0.040403
                      Estimate Std. Error    t value  Pr(>|t|)    CI Lower   CI Upper        DF
 crop_hhi_c       0.0184496865 0.08366425 0.22052056 0.8278235 -0.15668924 0.19358862 18.955782
 crop_hhi_c:luc_c 0.0009165631 0.02170810 0.04222217 0.9675393 -0.05076641 0.05259953  6.772597
-05c_village_fe.R done in 48.9 s
+05c_village_fe.R done in 44.7 s
+
+====================  05d_priority_split.R  ====================
+# A tibble: 1 × 5
+  hhi_prio_mean hhi_prio_sd hhi_nonprio_mean hhi_nonprio_sd      r
+          <dbl>       <dbl>            <dbl>          <dbl>  <dbl>
+1         0.162       0.156            0.102          0.103 -0.530
+05d_priority_split.R done in 0.5 s
 
 ====================  07_figures_maps.R  ====================
-07_figures_maps.R done in 1.2 s
+07_figures_maps.R done in 1.7 s
 
 ====================  extra.R  ====================
 Households per bin (min / max): 285 / 458 
@@ -642,9 +653,9 @@ Households in food group table: 3715
 10 Oils and fats                     90.4  0.781      65.2  ""        "palm oil, peanut oil, ma…
 11 Sweets                            59.4  9.18       46.2  ""        "sugar, sugarcane, honey" 
 12 Spices, condiments, beverages     99.8 26.1        78.3  ""        "salt, sorghum juice (\\t…
-extra.R done in 1.2 s
+extra.R done in 1 s
 
 ====================  tidy_tables.R  ====================
-tidy_tables.R done in 0.1 s
+tidy_tables.R done in 0 s
 
-Pipeline finished in 1.5 min
+Pipeline finished in 1.3 min
