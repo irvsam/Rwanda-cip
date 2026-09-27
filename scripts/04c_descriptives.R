@@ -30,15 +30,16 @@ desc_vars <- primary %>%
     `Head age`                                        = head_age,
     `Female-headed household`                         = head_female,
     `Head education`                                  = head_educ,
-    `Rural`                                           = ur_f,
-    `Province`                                        = province_f
+    `Residence` = factor(ur_f, levels = 1:2, labels = c("Urban", "Rural")),
+    `Province`  = factor(province_f, levels = 1:5,
+                         labels = c("Kigali City", "Southern", "Western", "Northern", "Eastern")),
   )
 
 print(summary(desc_vars))
 
-datasummary_skim(desc_vars, type = "numeric",
-                 title = "Descriptive statistics, AHS sample",
-                 output = file.path(output_tables_path, "table1_descriptives.tex"))
+datasummary(All(desc_vars) ~ Mean + SD + Min + Median + Max, data = desc_vars, fmt = 2,
+            title = "Descriptive statistics, AHS sample",
+            output = file.path(output_tables_path, "table1_descriptives.tex"))
 datasummary_skim(desc_vars, type = "categorical",
                  title = "Categorical variables, AHS sample",
                  output = file.path(output_tables_path, "table1_descriptives_categorical.tex"))

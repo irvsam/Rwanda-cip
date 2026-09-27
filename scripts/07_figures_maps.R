@@ -30,6 +30,7 @@ map_data <- rwa_map %>%
 
 stopifnot(sum(!is.na(map_data$luc_intensity)) == 30)   # every district joined
 
+
 p_map <- ggplot(map_data) +
   geom_sf(aes(fill = luc_intensity), colour = "white", linewidth = 0.1) +
   scale_fill_gradient(low = "grey90", high = "black",
@@ -85,3 +86,7 @@ ggsave(file.path(output_figures_path, "fig1_mechanism_chain.png"), p_chain,
        width = 9, height = 5.5, dpi = 300)
 
 message("Figures saved to ", output_figures_path)
+
+
+
+

@@ -54,14 +54,14 @@ cat("ICC (conditional on controls):", round(icc, 3), "\n")
 # ---- Tables ---------------------------------------------------
 modelsummary(
   main_models, coef_map = ALL_LABELS, gof_map = c("nobs", "r.squared"),
-  stars = TRUE, notes = TABLE_NOTES,
+  stars = TRUE, notes = STEP_NOTES,
   title = "Crop concentration, district LUC intensity and food value",
   output = file.path(output_tables_path, "food_value_steps.tex")
 )
 
 modelsummary(
   robust_models, coef_map = KEY_LABELS[1:3], gof_map = c("nobs", "r.squared"),
-  stars = TRUE, notes = TABLE_NOTES,
+  stars = TRUE, notes = STEP_NOTES,
   title = "Robustness: food value",
   output = file.path(output_tables_path, "food_value_robust.tex")
 )

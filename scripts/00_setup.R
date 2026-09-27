@@ -143,5 +143,15 @@ TABLE_NOTES <- paste(
   "Reference education category: never attended."
 )
 
+STEP_NOTES <- paste(
+  "CR2 standard errors clustered by district (30 clusters) in parentheses.",
+  "(1) urban/rural and province fixed effects; (2) adds household size, dependency ratio",
+  "and head age, sex and education; (3) adds log land held.",
+  "HHI and LUC intensity are centred on their sample means. Reference education category: never attended."
+)
+
 .setup_done <- TRUE
 message("Setup complete")
+
+
+
