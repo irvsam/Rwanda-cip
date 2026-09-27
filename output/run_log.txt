@@ -1,0 +1,568 @@
+
+====================  00_setup.R  ====================
+00_setup.R done in 0 s
+
+====================  01a_load_eicv7.R  ====================
+01a_load_eicv7.R done in 2.1 s
+
+====================  01b_load_ahs.R  ====================
+# A tibble: 4 × 4
+  file   rows households matched_in_eicv7
+  <chr> <int>      <int>            <int>
+1 s1    16292       3724             3724
+2 s2    23266       3724             3724
+3 s34   32616       3717             3717
+4 s6     9286       3724             3724
+01b_load_ahs.R done in 1.2 s
+
+====================  03_build_luc.R  ====================
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.1729  3.8131  8.3803  9.7303 13.5184 26.3191 
+03_build_luc.R done in 0.3 s
+
+====================  04a_build_analysis_data.R  ====================
+Max |cons1ae / hh_index - sol_jan|: 3.967296 
+Max |food - (exp9 + exp10 + Food_at_school)|: 0.7211914 
+Households with food = 0 or NA: 0 
+Households with more than one head: 0 
+# A tibble: 16 × 3
+   head_diploma_raw                                 head_educ                    n
+   <fct>                                            <fct>                    <int>
+ 1 Primary school certificate                       Primary                    899
+ 2 Post primary certificate  (CE/FM/TVET I/TVET II) Secondary or TVET           72
+ 3 EMA/ENTA                                         Secondary or TVET            9
+ 4 O' level Certificate                             Secondary or TVET           69
+ 5 A3/D4/D5                                         Secondary or TVET            3
+ 6 A2/D6/D7                                         Secondary or TVET          104
+ 7 TVET certificate IV                              Secondary or TVET            1
+ 8 TVET certificate V                               Secondary or TVET            5
+ 9 TVET advanced diploma (A1                        Tertiary                     2
+10 Diploma(A1): D6+2-3yrs                           Tertiary                     8
+11 Bachelor(A0): D6+3-6yrs                          Tertiary                    20
+12 Post Graduate Diploma                            Tertiary                     1
+13 Masters: Bachelor+1-2yrs                         Tertiary                     2
+14 Doctorate(PhD)                                   Tertiary                     1
+15 <NA>                                             Never attended             756
+16 <NA>                                             Attended, no certificate  1772
+AHS households with no head found: 0 
+Households with conflicting total_agr_land values: 0 
+# A tibble: 1 × 2
+  plots over_100
+  <int>    <int>
+1 15473     6369
+Share of households with HHI = 1 (single crop): 0.028 
+Districts in base not found in dist_luc:  
+
+Primary (AHS) sample: 3697 households
+
+Missing values within the AHS sample:
+# A tibble: 11 × 2
+   variable         n_missing
+   <chr>                <int>
+ 1 log_food_ae_real         0
+ 2 crop_hhi                 0
+ 3 prio_share               0
+ 4 luc_intensity            0
+ 5 log_land                 0
+ 6 hh_size                  0
+ 7 dep_ratio                0
+ 8 head_age                 0
+ 9 head_female              0
+10 head_educ                0
+11 wt_ahs                   0
+
+Season A area larger than land held (should be rare): 4 
+Correlation, nominal vs real log food per ae: 0.952 
+Weighted share female-headed, AHS sample (NISR reports 25.7%): 0.256 
+Correlation of HHI with cooperative membership (proxy check): -0.061 
+NA counts in master:
+# A tibble: 38 × 2
+   variable            n_missing
+   <chr>                   <int>
+ 1 head_diploma_raw        13858
+ 2 crop_hhi                11357
+ 3 n_crops                 11357
+ 4 prio_share              11357
+ 5 top_crop_prio           11357
+ 6 area_A_ha               11357
+ 7 land_ha                 11337
+ 8 log_land                11337
+ 9 n_members_ahs           11330
+10 n_dep                   11330
+11 n_working               11330
+12 dep_ratio               11330
+13 head_female             11330
+14 head_age                11330
+15 head_educ               11330
+16 wt_ahs                  11330
+17 coop                    11330
+18 contract                11330
+19 crop_ins                11330
+20 hhid                        0
+21 clust                       0
+22 province                    0
+23 district_code               0
+24 ur                          0
+25 ae                          0
+26 hh_size                     0
+27 food                        0
+28 hh_index                    0
+29 wt_eicv                     0
+30 food_ae_nominal             0
+31 food_ae_real                0
+32 log_food_ae_nominal         0
+33 log_food_ae_real            0
+34 luc_intensity               0
+35 luc_intensity_A             0
+36 in_ahs                      0
+37 ur_f                        0
+38 province_f                  0
+NA counts in master (AHS sample only):
+# A tibble: 38 × 2
+   variable            n_missing
+   <chr>                   <int>
+ 1 head_diploma_raw         2510
+ 2 hhid                        0
+ 3 clust                       0
+ 4 province                    0
+ 5 district_code               0
+ 6 ur                          0
+ 7 ae                          0
+ 8 hh_size                     0
+ 9 food                        0
+10 hh_index                    0
+11 wt_eicv                     0
+12 food_ae_nominal             0
+13 food_ae_real                0
+14 log_food_ae_nominal         0
+15 log_food_ae_real            0
+16 n_members_ahs               0
+17 n_dep                       0
+18 n_working                   0
+19 dep_ratio                   0
+20 head_female                 0
+21 head_age                    0
+22 head_educ                   0
+23 land_ha                     0
+24 wt_ahs                      0
+25 crop_hhi                    0
+26 n_crops                     0
+27 prio_share                  0
+28 top_crop_prio               0
+29 area_A_ha                   0
+30 coop                        0
+31 contract                    0
+32 crop_ins                    0
+33 luc_intensity               0
+34 luc_intensity_A             0
+35 in_ahs                      0
+36 log_land                    0
+37 ur_f                        0
+38 province_f                  0
+04a_build_analysis_data.R done in 0.7 s
+
+====================  04b_build_diet.R  ====================
+Households with no answered consumption items (set to NA): 0 
+
+Diet measures built for 15054 households
+
+HDDS distribution:
+# A tibble: 13 × 2
+    hdds     n
+   <dbl> <int>
+ 1     0   122
+ 2     1    23
+ 3     2    18
+ 4     3    35
+ 5     4   131
+ 6     5   516
+ 7     6  1293
+ 8     7  2566
+ 9     8  3531
+10     9  3441
+11    10  1987
+12    11  1014
+13    12   377
+
+Non-staple diversity distribution:
+# A tibble: 7 × 2
+  hdds_nonstaple     n
+           <dbl> <int>
+1              0   202
+2              1  1905
+3              2  4337
+4              3  4759
+5              4  2380
+6              5  1082
+7              6   389
+
+Missing diet measures in AHS sample: 0 
+Correlation of HDDS with log food per ae (full sample): 0.379 
+# A tibble: 10 × 2
+   name                value
+   <chr>               <dbl>
+ 1 hdds_mean           8.11 
+ 2 hdds_sd             1.56 
+ 3 hdds_purch_mean     6.23 
+ 4 hdds_purch_sd       2.27 
+ 5 hdds_own_mean       3.52 
+ 6 hdds_own_sd         1.72 
+ 7 hdds_nonstaple_mean 2.68 
+ 8 hdds_nonstaple_sd   1.10 
+ 9 purch_share_mean    0.560
+10 purch_share_sd      0.210
+04b_build_diet.R done in 1.2 s
+
+====================  04c_descriptives.R  ====================
+ Own-produced food groups Purchased share of consumed items Purchased food groups
+ Min.   :0.000            Min.   :0.0000                    Min.   : 0.000       
+ 1st Qu.:2.000            1st Qu.:0.4167                    1st Qu.: 5.000       
+ Median :4.000            Median :0.5714                    Median : 6.000       
+ Mean   :3.515            Mean   :0.5603                    Mean   : 6.232       
+ 3rd Qu.:5.000            3rd Qu.:0.7143                    3rd Qu.: 8.000       
+ Max.   :9.000            Max.   :1.0000                    Max.   :12.000       
+                          NA's   :5                                              
+ Dietary diversity (HDDS, 0-12) Non-staple food groups (0-6)
+ Min.   : 0.000                 Min.   :0.000               
+ 1st Qu.: 7.000                 1st Qu.:2.000               
+ Median : 8.000                 Median :3.000               
+ Mean   : 8.114                 Mean   :2.683               
+ 3rd Qu.: 9.000                 3rd Qu.:3.000               
+ Max.   :12.000                 Max.   :6.000               
+                                                            
+ Food consumption per AE, Jan 2024 prices (RWF) Crop concentration (HHI, Season A)
+ Min.   :  71552                                Min.   :0.09284                   
+ 1st Qu.: 357910                                1st Qu.:0.19865                   
+ Median : 474341                                Median :0.26187                   
+ Mean   : 522910                                Mean   :0.32472                   
+ 3rd Qu.: 634211                                3rd Qu.:0.38000                   
+ Max.   :6210046                                Max.   :1.00000                   
+                                                                                  
+ Number of crops, Season A Share of crop area in CIP priority crops
+ Min.   : 1.000            Min.   :0.0000                          
+ 1st Qu.: 4.000            1st Qu.:0.3993                          
+ Median : 6.000            Median :0.5877                          
+ Mean   : 5.774            Mean   :0.5937                          
+ 3rd Qu.: 7.000            3rd Qu.:0.8077                          
+ Max.   :16.000            Max.   :1.0000                          
+                                                                   
+ District LUC intensity (pp) Agricultural land held (ha) Household size  
+ Min.   : 0.1729             Min.   :9.700e-06           Min.   : 1.000  
+ 1st Qu.: 3.5622             1st Qu.:1.449e-01           1st Qu.: 3.000  
+ Median : 8.6300             Median :2.798e-01           Median : 4.000  
+ Mean   :10.4087             Mean   :4.171e-01           Mean   : 4.381  
+ 3rd Qu.:13.6450             3rd Qu.:5.134e-01           3rd Qu.: 6.000  
+ Max.   :26.3191             Max.   :1.249e+01           Max.   :14.000  
+                                                                         
+ Dependency ratio    Head age      Female-headed household
+ Min.   :0.0000   Min.   : 19.00   Min.   :0.0000         
+ 1st Qu.:0.4286   1st Qu.: 37.00   1st Qu.:0.0000         
+ Median :1.0000   Median : 47.00   Median :0.0000         
+ Mean   :0.9460   Mean   : 49.61   Mean   :0.2659         
+ 3rd Qu.:1.3333   3rd Qu.: 62.00   3rd Qu.:1.0000         
+ Max.   :6.0000   Max.   :107.00   Max.   :1.0000         
+                                                          
+                  Head education Rural    Province
+ Never attended          : 751   1: 329   1:  44  
+ Attended, no certificate:1759   2:3368   2:1057  
+ Primary                 : 893            3: 827  
+ Secondary or TVET       : 261            4: 765  
+ Tertiary                :  33            5:1004  
+                                                  
+                                                  
+
+HHI distribution (spike at 1?):
+# A tibble: 5 × 2
+  hhi_band         n
+  <fct>        <int>
+1 [0,0.25]      1697
+2 (0.25,0.5]    1470
+3 (0.5,0.75]     356
+4 (0.75,0.999]    72
+5 (0.999,1]      102
+
+LUC intensity across the 30 districts (pp):
+# A tibble: 1 × 6
+  districts   min   p10 median   p90   max
+      <int> <dbl> <dbl>  <dbl> <dbl> <dbl>
+1        30 0.173  2.34   8.38  19.6  26.3
+
+Land confounding: HHI and outcomes by land tercile:
+# A tibble: 3 × 6
+  land_tercile     n mean_land_ha mean_hhi mean_hdds mean_log_food
+         <int> <int>        <dbl>    <dbl>     <dbl>         <dbl>
+1            1  1233        0.103    0.391      7.79          13.0
+2            2  1232        0.286    0.303      8.10          13.1
+3            3  1232        0.863    0.280      8.46          13.2
+
+Is concentration concentration in CIP priority crops?
+# A tibble: 3 × 5
+  hhi_tercile     n mean_hhi mean_prio_share share_top_is_prio
+        <int> <int>    <dbl>           <dbl>             <dbl>
+1           1  1233    0.177           0.453             0.590
+2           2  1232    0.266           0.579             0.721
+3           3  1232    0.531           0.750             0.808
+Correlation of HHI with priority-crop share: 0.436 
+Correlation of HDDS with log food per AE: 0.412 
+AHS households with HDDS = 0: 5 
+04c_descriptives.R done in 0.1 s
+
+====================  05_main_models.R  ====================
+Primary sample: 3697 households in 30 districts
+                     Estimate  Std. Error   t value  Pr(>|t|)     CI Lower   CI Upper
+crop_hhi_c       -0.096260228 0.055805353 -1.724928 0.1001091 -0.212739866 0.02021941
+luc_c            -0.004964979 0.003270851 -1.517947 0.2013070 -0.013928229 0.00399827
+crop_hhi_c:luc_c  0.006343045 0.005601925  1.132297 0.2939025 -0.006836386 0.01952248
+                        DF
+crop_hhi_c       19.809753
+luc_c             4.137862
+crop_hhi_c:luc_c  7.179985
+                     Estimate  Std. Error    t value   Pr(>|t|)    CI Lower    CI Upper
+crop_hhi_c       -0.117241731 0.063983927 -1.8323622 0.08203403 -0.25082614 0.016342681
+luc_c            -0.004815771 0.002919836 -1.6493293 0.17208957 -0.01281899 0.003187452
+crop_hhi_c:luc_c  0.002451085 0.005734885  0.4273991 0.68160480 -0.01103899 0.015941156
+                        DF
+crop_hhi_c       19.732064
+luc_c             4.135300
+crop_hhi_c:luc_c  7.185852
+                     Estimate  Std. Error    t value  Pr(>|t|)    CI Lower    CI Upper
+crop_hhi_c        0.013696994 0.062097075  0.2205739 0.8276707 -0.11587400 0.143267988
+luc_c            -0.004962477 0.003441947 -1.4417643 0.2204402 -0.01438932 0.004464364
+crop_hhi_c:luc_c -0.001311773 0.005976237 -0.2194982 0.8322965 -0.01533688 0.012713329
+                        DF
+crop_hhi_c       19.907091
+luc_c             4.143985
+crop_hhi_c:luc_c  7.272012
+# A tibble: 3 × 11
+  luc_pctile luc_intensity     L   slope     se effect_1sd low_1sd high_1sd pct_1sd
+  <chr>              <dbl> <dbl>   <dbl>  <dbl>      <dbl>   <dbl>    <dbl>   <dbl>
+1 p10                 2.34 -8.07 0.0243  0.0995   0.00459  -0.0339   0.0430  0.460 
+2 p50                 8.38 -2.03 0.0164  0.0703   0.00309  -0.0241   0.0302  0.310 
+3 p90                19.6   9.16 0.00169 0.0513   0.000318 -0.0195   0.0201  0.0318
+  pct_1sd_low pct_1sd_high
+        <dbl>        <dbl>
+1       -3.33         4.40
+2       -2.38         3.07
+3       -1.93         2.04
+
+Random-slope model, singular: FALSE 
+                    Estimate  Std. Error       df   t value  Pr(>|t|)
+crop_hhi_c       0.014287003 0.054174708 15.59594 0.2637209 0.7954478
+crop_hhi_c:luc_c 0.002311396 0.006784719 10.88037 0.3406768 0.7398340
+ICC (conditional on controls): 0.052 
+05_main_models.R done in 0.8 s
+
+====================  05b_diet_models.R  ====================
+                     Estimate Std. Error    t value     Pr(>|t|)    CI Lower
+crop_hhi_c       -0.835012615 0.17548992 -4.7581800 0.0001230133 -1.20130367
+luc_c             0.004762884 0.01636013  0.2911274 0.7849668533 -0.04006947
+crop_hhi_c:luc_c -0.003272308 0.01634432 -0.2002107 0.8468688928 -0.04172496
+                    CI Upper        DF
+crop_hhi_c       -0.46872155 19.809753
+luc_c             0.04959524  4.137862
+crop_hhi_c:luc_c  0.03518034  7.179985
+                     Estimate Std. Error     t value     Pr(>|t|)    CI Lower
+crop_hhi_c       -0.805809167 0.18490612 -4.35793681 0.0003132321 -1.19185260
+luc_c             0.002813360 0.01526409  0.18431229 0.8624559112 -0.03902527
+crop_hhi_c:luc_c  0.001871378 0.01920752  0.09742943 0.9250473936 -0.04331014
+                    CI Upper        DF
+crop_hhi_c       -0.41976574 19.732064
+luc_c             0.04465199  4.135300
+crop_hhi_c:luc_c  0.04705289  7.185852
+                     Estimate Std. Error    t value   Pr(>|t|)    CI Lower    CI Upper
+crop_hhi_c       -0.514697337 0.19128935 -2.6906743 0.01409857 -0.91383936 -0.11555532
+luc_c             0.002487194 0.01724787  0.1442030 0.89208281 -0.04475145  0.04972584
+crop_hhi_c:luc_c -0.006494462 0.02111202 -0.3076192 0.76699614 -0.05604039  0.04305147
+                        DF
+crop_hhi_c       19.907091
+luc_c             4.143985
+crop_hhi_c:luc_c  7.272012
+
+ Own-produced groups 
+                     Estimate Std. Error    t value     Pr(>|t|)    CI Lower
+crop_hhi_c       -1.864499550 0.20284768 -9.1916238 1.334011e-08 -2.28775903
+luc_c            -0.002716231 0.01709391 -0.1589005 8.811924e-01 -0.04953320
+crop_hhi_c:luc_c  0.015707659 0.02620641  0.5993824 5.671161e-01 -0.04579384
+                    CI Upper        DF
+crop_hhi_c       -1.44124007 19.907091
+luc_c             0.04410074  4.143985
+crop_hhi_c:luc_c  0.07720916  7.272012
+
+ Purchased share of items 
+                      Estimate  Std. Error    t value     Pr(>|t|)     CI Lower
+crop_hhi_c        0.1503613551 0.032642620  4.6062895 0.0001711856  0.082266137
+luc_c             0.0007188328 0.001407072  0.5108713 0.6354504778 -0.003134372
+crop_hhi_c:luc_c -0.0060040424 0.003295051 -1.8221393 0.1086679464 -0.013701716
+                    CI Upper        DF
+crop_hhi_c       0.218456573 19.982118
+luc_c            0.004572038  4.145406
+crop_hhi_c:luc_c 0.001693631  7.447367
+
+ Purchased groups 
+                     Estimate Std. Error    t value   Pr(>|t|)    CI Lower    CI Upper
+crop_hhi_c        0.271709155 0.27996556  0.9705092 0.34343779 -0.31246355 0.855881860
+luc_c             0.005099109 0.02759916  0.1847559 0.86211207 -0.07048977 0.080687983
+crop_hhi_c:luc_c -0.050764324 0.02504853 -2.0266391 0.08080454 -0.10954850 0.008019847
+                        DF
+crop_hhi_c       19.907091
+luc_c             4.143985
+crop_hhi_c:luc_c  7.272012
+
+ Dietary diversity (HDDS) 
+                     Estimate Std. Error    t value   Pr(>|t|)    CI Lower    CI Upper
+crop_hhi_c       -0.514697337 0.19128935 -2.6906743 0.01409857 -0.91383936 -0.11555532
+luc_c             0.002487194 0.01724787  0.1442030 0.89208281 -0.04475145  0.04972584
+crop_hhi_c:luc_c -0.006494462 0.02111202 -0.3076192 0.76699614 -0.05604039  0.04305147
+                        DF
+crop_hhi_c       19.907091
+luc_c             4.143985
+crop_hhi_c:luc_c  7.272012
+
+ Non-staple groups 
+                     Estimate Std. Error    t value  Pr(>|t|)    CI Lower    CI Upper
+crop_hhi_c       -0.236412805 0.11749915 -2.0120384 0.0579465 -0.48158510 0.008759487
+luc_c             0.004631124 0.01059890  0.4369440 0.6839606 -0.02439725 0.033659496
+crop_hhi_c:luc_c  0.002985062 0.01046347  0.2852841 0.7833815 -0.02157073 0.027540854
+                        DF
+crop_hhi_c       19.907091
+luc_c             4.143985
+crop_hhi_c:luc_c  7.272012
+# A tibble: 15 × 6
+   outcome                  luc_pctile luc_intensity effect_1sd  low_1sd high_1sd
+   <chr>                    <chr>              <dbl>      <dbl>    <dbl>    <dbl>
+ 1 Own-produced groups      p10                 2.34    -0.376  -0.516   -0.237  
+ 2 Own-produced groups      p50                 8.38    -0.358  -0.449   -0.268  
+ 3 Own-produced groups      p90                19.6     -0.325  -0.410   -0.240  
+ 4 Purchased share of items p10                 2.34     0.0376  0.0165   0.0587 
+ 5 Purchased share of items p50                 8.38     0.0307  0.0162   0.0452 
+ 6 Purchased share of items p90                19.6      0.0180  0.00855  0.0275 
+ 7 Purchased groups         p10                 2.34     0.129  -0.0325   0.290  
+ 8 Purchased groups         p50                 8.38     0.0708 -0.0482   0.190  
+ 9 Purchased groups         p90                19.6     -0.0365 -0.138    0.0648 
+10 Dietary diversity (HDDS) p10                 2.34    -0.0873 -0.201    0.0267 
+11 Dietary diversity (HDDS) p50                 8.38    -0.0948 -0.176   -0.0139 
+12 Dietary diversity (HDDS) p90                19.6     -0.108  -0.195   -0.0225 
+13 Non-staple groups        p10                 2.34    -0.0492 -0.115    0.0167 
+14 Non-staple groups        p50                 8.38    -0.0458 -0.0952   0.00355
+15 Non-staple groups        p90                19.6     -0.0395 -0.0847   0.00569
+
+AHS households with HDDS = 0: 5 
+
+Robustness: Dietary diversity (HDDS) 
+
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | Primary | AHS weights | Season A LUC | Excl. HDDS = 0 |
++======================================+=========+=============+==============+================+
+| Crop concentration (HHI, centred)    | -0.515* | -0.448*     | -0.535**     | -0.426*        |
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | (0.191) | (0.183)     | (0.183)      | (0.176)        |
++--------------------------------------+---------+-------------+--------------+----------------+
+| District LUC intensity (pp, centred) | 0.002   | 0.005       | 0.006        | 0.002          |
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | (0.017) | (0.027)     | (0.007)      | (0.017)        |
++--------------------------------------+---------+-------------+--------------+----------------+
+| HHI x LUC intensity                  | -0.006  | 0.032       | -0.003       | -0.004         |
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | (0.021) | (0.043)     | (0.010)      | (0.014)        |
++--------------------------------------+---------+-------------+--------------+----------------+
+| Num.Obs.                             | 3697    | 3697        | 3697         | 3692           |
++======================================+=========+=============+==============+================+
+| + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001                                            |
++======================================+=========+=============+==============+================+ 
+
+Robustness: Purchased groups 
+
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | Primary | AHS weights | Season A LUC | Excl. HDDS = 0 |
++======================================+=========+=============+==============+================+
+| Crop concentration (HHI, centred)    | 0.272   | 0.457       | 0.221        | 0.349          |
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | (0.280) | (0.336)     | (0.261)      | (0.291)        |
++--------------------------------------+---------+-------------+--------------+----------------+
+| District LUC intensity (pp, centred) | 0.005   | 0.007       | 0.009        | 0.005          |
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | (0.028) | (0.057)     | (0.009)      | (0.027)        |
++--------------------------------------+---------+-------------+--------------+----------------+
+| HHI x LUC intensity                  | -0.051+ | -0.001      | -0.029*      | -0.047+        |
++--------------------------------------+---------+-------------+--------------+----------------+
+|                                      | (0.025) | (0.087)     | (0.013)      | (0.025)        |
++--------------------------------------+---------+-------------+--------------+----------------+
+| Num.Obs.                             | 3697    | 3697        | 3697         | 3692           |
++======================================+=========+=============+==============+================+
+| + p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001                                            |
++======================================+=========+=============+==============+================+ 
+
+Random-slope model: hdds  singular: FALSE 
+                    Estimate Std. Error       df     t value   Pr(>|t|)
+crop_hhi_c       -0.29686042 0.14539173 19.28855 -2.04179717 0.05508874
+crop_hhi_c:luc_c -0.00159033 0.01690986 11.03946 -0.09404753 0.92675666
+
+Random-slope model: hdds_purch  singular: TRUE 
+                    Estimate Std. Error       df    t value   Pr(>|t|)
+crop_hhi_c        0.44693199 0.20429883 2587.987  2.1876385 0.02878511
+crop_hhi_c:luc_c -0.01633756 0.02342591 2469.043 -0.6974143 0.48560923
+05b_diet_models.R done in 1 s
+
+====================  07_figures_maps.R  ====================
+07_figures_maps.R done in 1 s
+
+====================  extra.R  ====================
+Households per bin (min / max): 338 / 401 
+
+ Cereals :
+ Corn (flour from Mill); Corn (flour from Factory); Local rice; Imported rice; Maize (fresh); Dry maize (grain); Cakes/Chapati/Mandazi; Bread; Sorghum; Fermented sorghum; Wheat (grain); Other cereals; Sorghum (flour); Wheat (flour); Millet (flour); Other flour of cereals; Biscuits; Pasta 
+
+ White roots and tubers :
+ Irish potato; Sweet potato; Cassava (root); Tarot/amateke; Banana-cooking (Inyamunyo); Cassava flour (yasekuwe); Cassava (fermented); Cassava from Mill); Cassava from Factory); Yams/Ibikoro; Other tubers 
+
+ Vegetables :
+ String bean; Tomato; Green pea (fresh); Onion; Garlic; Pumpkin; Cucumber; Eggplant; Carrot; Leeks; Lettuce; Celery; Parsley; Mushrooms; Cassava leaves; Amarante (small leafed green); Cabbages; Spinach; Amarante (large leafed green); Other Vegetables; Chayote; Pepper 
+
+ Fruits :
+ Banana fruit (Imineke); Mangos; Papayas; Avocado; Pineapple; Guava; Orange (local); Orange (imported); Tangerine; Citron - Lemon; Passion Fruit; Plums; Berries; Apples; Other fruits 
+
+ Meat :
+ Beef meat; Sheep /Mutton / lamb meat; Goat meat; Pork meat; Rabbit Meat; Wild Meat; Other Meats; Sausages, bacon, ham  etc; Preserved/canned meat; Chicken live; Frozen chicken; Other domestic poultries e.g. ducks 
+
+ Eggs :
+ Eggs 
+
+ Fish :
+ Fish (fresh / frozen); Small Sized Fish (fresh); Fish (dry / smoked); Small Sized Fish (dry); Preserved/canned fish 
+
+ Legumes, nuts and seeds :
+ Dry bean; Fresh bean; Groundnut flour; Soya Flour; Sunflower flour; Ground nuts (peanuts); Grilled ground nuts; Soya (fresh); Soya (dry); Green pea (dry) 
+
+ Milk and milk products :
+ Fresh milk; Curdled Milk; Condensed milk unsweetened; Milk powder; Yogurt;  Ice cream; Cheese 
+
+ Oils and fats :
+ Peanut oil; Margarine; Palm oil; Other plant oils; Lard of pork; Butter (local); Butter (imported) 
+
+ Sweets :
+ Sugar  (imported); Sugar (local); Sugarcane; Jam, marmalade; Honey; Chocolate; Candy / Gum; Sugar glu 
+
+ Spices, condiments, beverages :
+ Salt; Local banana beer; Sorghum juice(Ubushera); Local sorghum beer(ikigage); Banana - beer (Ikakama/Inkashi); Pepper(ground / liquid); Vinegar; Mayonnaise; Tomato concentrate; Pepper-raw; Boullion cubes(MAGGI); Coffee (local); Coffee (imported); Tea (local); Tea (imported); Cocoa and powdered drinking chocolate; Carbonated Soft Drinks; Local banana juice; Passion fruit juice; Other juices of fruits (local); Other juices of fruits (imported); Powdered juice(super dip); Liqueurs  (local); Liqueurs  (imported); Wine (local); Wine (imported); Other local beer; Commercial beer (local); Commercial beer (imported) 
+Households in food group table: 3697 
+# A tibble: 12 × 6
+   group                         consumed     own purchased nonstaple examples          
+   <fct>                            <dbl>   <dbl>     <dbl> <chr>     <chr>             
+ 1 Cereals                           95.1 43.2        81.6  ""        "maize flour, sor…
+ 2 White roots and tubers            99.1 77.7        72.7  ""        "Irish potato, ca…
+ 3 Vegetables                        99.0 77.0        85.8  "Yes"     "cassava leaves (…
+ 4 Fruits                            73.4 36.1        46.6  "Yes"     "banana (\\textit…
+ 5 Meat                              11.1  0.866       9.58 "Yes"     "beef, goat, chic…
+ 6 Eggs                              10.7  5.71        4.52 "Yes"     "eggs"            
+ 7 Fish                              48.7  0.0811     45.4  "Yes"     "fresh fish, drie…
+ 8 Legumes, nuts and seeds           99.4 65.5        75.0  ""        "dry beans, groun…
+ 9 Milk and milk products            25.3  9.09       12.2  "Yes"     "fresh milk, curd…
+10 Oils and fats                     90.4  0.784      65.3  ""        "palm oil, peanut…
+11 Sweets                            59.3  9.20       46.2  ""        "sugar, sugarcane…
+12 Spices, condiments, beverages     99.8 26.2        78.3  ""        "salt, sorghum ju…
+extra.R done in 0.4 s
+
+====================  tidy_tables.R  ====================
+tidy_tables.R done in 0 s
+
+Pipeline finished in 0.1 min

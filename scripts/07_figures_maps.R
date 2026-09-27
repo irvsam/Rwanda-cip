@@ -1,11 +1,11 @@
-# ============================================================
-# 07_figures_maps.R
+
+# 07_figures_maps.R ----------------
 # Figures for the paper (greyscale-safe, serif).
 #
 #   Map 1    : district LUC intensity
 #   Figure 1 : the mechanism chain. HHI effect (per one-SD increase)
 #              on each outcome, in low- vs high-LUC districts
-# ============================================================
+
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
 dist_luc   <- readRDS(file.path(processed_path, "dist_luc.rds"))
@@ -19,9 +19,10 @@ theme_paper <- theme_classic(base_size = 12, base_family = "serif") +
         strip.text = element_text(size = 11),
         panel.grid.major.y = element_line(colour = "grey90", linewidth = 0.3))
 
-# ============================================================
-# MAP 1: District LUC intensity
-# ============================================================
+
+# luc intensity map ----------------------------------------------------
+
+
 
 map_data <- rwa_map %>%
   left_join(dist_luc %>% mutate(district_code = as.character(district_code)),
@@ -39,10 +40,10 @@ p_map <- ggplot(map_data) +
 ggsave(file.path(output_figures_path, "map_luc_intensity.png"), p_map,
        width = 7, height = 6, dpi = 300)
 
-# ============================================================
-# FIGURE 1: The mechanism chain
-# Units differ by outcome, so each panel has its own y-axis.
-# ============================================================
+
+# mechanism chain ---------------------------------------------------------
+
+
 
 chain_order <- c(
   "Own-produced groups"      = "1. Own-produced food groups",

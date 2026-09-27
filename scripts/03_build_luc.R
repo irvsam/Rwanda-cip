@@ -1,5 +1,5 @@
-# ============================================================
-# 03_build_luc.R
+
+# 03_build_luc.R ------------------------------------------------------
 # Construct the district-level LUC intensity variable from
 # SAS 2024: area-weighted share of agricultural land under
 # consolidation (plot area x SAS plot weight, NISR SAS metadata
@@ -7,10 +7,11 @@
 #   luc_intensity   : mean of Seasons A, B and C (primary moderator)
 #   luc_intensity_A : Season A only, matching the AHS crop season
 # Also caches the district boundary shapefile for the map in 07.
-# ============================================================
+
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
 
+# load screening files -----------------------------------
 # Only the Screening files are used (they carry the LUC response,
 # s2q12, and plot size/weight needed to build the intensity measure).
 
@@ -18,10 +19,12 @@ sas_a <- read_dta(file.path(data_path, "SAS 2024/Season A/Rwa_raw_SeasonA2024_Sc
 sas_b <- read_dta(file.path(data_path, "SAS 2024/Season B/Rwa_raw_SeasonB2024_Screening.dta")) %>% mutate(season = "B")
 sas_c <- read_dta(file.path(data_path, "SAS 2024/Season C/Rwa_raw_SeasonC2024_Screening.dta")) %>% mutate(season = "C")
 
+
+# select only what is needed -------------------------------
 # Columns needed: segment id, district (s1q2), plot type (s2q6), LUC response (s2q12), plot size, and plot weight.
 clean_sas <- function(df) {
   df %>%
-    select(Segment_ID, s1q1, s1q2, s1q13, s2q1, s2q6, s2q7, s2q12,
+    select(Segment_ID, s1q2, s2q6, s2q12,
            Plot_size_ha, plot_weight)
 }
 

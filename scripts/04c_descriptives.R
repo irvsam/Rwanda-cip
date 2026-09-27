@@ -1,8 +1,8 @@
-# ============================================================
+
 # 04c_descriptives.R
 # Descriptive statistics for the primary (AHS) estimation sample,
 # plus the checks reported in the research design section.
-# ============================================================
+
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
 master  <- readRDS(file.path(processed_path, "master.rds"))

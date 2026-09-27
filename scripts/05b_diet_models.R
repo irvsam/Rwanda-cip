@@ -1,5 +1,5 @@
-# ============================================================
-# 05b_diet_models.R
+
+# 05b_diet_models.R ---------------------
 # Diet outcomes along the mechanism chain, same sample and
 # specification as 05 (HHI x district LUC, predetermined controls
 # including land, CR2 SEs by district).
@@ -13,7 +13,6 @@
 # HDDS was fixed as the primary outcome from its distribution before
 # any modelling (no ceiling: mean 8.1, SD 1.6 in the AHS sample).
 # Counts are modelled by OLS so coefficients read as food groups.
-# ============================================================
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
 master  <- readRDS(file.path(processed_path, "master.rds"))
@@ -62,6 +61,12 @@ diet_robust <- imap(robust_outcomes, function(label, y) {
     "Season A LUC"   = fit_cl(make_f(y), primary_A),
     "Excl. HDDS = 0" = fit_cl(make_f(y), filter(primary, hdds > 0))
   )
+})
+
+iwalk(diet_robust, function(models, y) {
+  cat("\nRobustness:", robust_outcomes[[y]], "\n")
+  print(modelsummary(models, coef_map = KEY_LABELS[1:3], gof_map = "nobs",
+                     stars = TRUE, output = "markdown"))
 })
 
 diet_ml <- map(names(robust_outcomes), ~ fit_ml(make_f(.x), primary)) %>%

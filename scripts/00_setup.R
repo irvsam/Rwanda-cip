@@ -1,9 +1,6 @@
-# ============================================================
-# 00_setup.R
-# Libraries, paths, options and helpers shared across scripts.
+# all shared helpers an functions and initial setup
 
-# ============================================================
-
+# reminder: install these first if not yet done...
 # ---- Libraries ---------------------------------------------
 library(haven)
 library(labelled)
@@ -34,14 +31,18 @@ for (p in c(processed_path, output_figures_path, output_tables_path)) {
 options(modelsummary_factory_latex = "kableExtra",
         modelsummary_format_numeric_latex = "plain")
 
+# Use broom for tidy() and glance() methods, not modelsummary's own
+options(modelsummary_get = "broom")
+
 # Print value labels in 01b? Set TRUE when checking codes by hand.
 if (!exists("CHECK_LABELS")) CHECK_LABELS <- FALSE
 
-# ============================================================
-# Shared helpers
-# ============================================================
+
+# Shared helpers - id number and uniqueness check -----------------------------
+
 
 # Labelled Stata ID/code -> plain numeric
+# function for handling the stata ids
 id_num <- function(x) as.numeric(zap_labels(x))
 
 # Stop if a household-level table has duplicated hhid
@@ -51,11 +52,11 @@ check_unique <- function(df, name) {
   message(name, ": ", nrow(df), " households, hhid unique")
 }
 
-# ---- Model helpers (used by 05 and 05b so both use the identical
-# sample, centring, specification and inference) --------------
+# Model helpers (used by 05 and 05b so both use the identical sample, centring, specification and inference)  --------------
 
 # Primary estimation sample: AHS households, HHI and LUC centred on
 # this sample
+
 make_primary <- function(master) {
   master %>%
     filter(in_ahs) %>%
@@ -76,8 +77,8 @@ make_f <- function(outcome, controls = CONTROLS) {
 }
 
 # OLS with CR2 standard errors clustered by district
-fit_cl <- function(f, data, ...) {
-  lm_robust(f, data = data, clusters = district_code, ...)
+fit_cl <- function(f, data, se_type = "CR2", ...) {
+  lm_robust(f, data = data, clusters = district_code, se_type = se_type, ...)
 }
 
 # Random-slope multilevel check (Heisig & Schaeffer, 2019)
@@ -88,7 +89,7 @@ fit_ml <- function(f, data) {
 
 # Marginal effect of HHI at the 10th, 50th and 90th percentiles of
 # district LUC, in outcome units for a one-SD increase in HHI.
-# t critical value uses (clusters - 1) df, conservative with 30.
+# CIs use a t critical value with (clusters - 1) = 29 df
 slope_at <- function(model, data, hhi = "crop_hhi_c", int = "crop_hhi_c:luc_c") {
   b <- coef(model)
   V <- vcov(model)

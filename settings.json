@@ -1,0 +1,53 @@
+{
+  // ---- LaTeX Workshop: clean builds for report/main.tex ----------
+  // Aux files (.aux, .bcf, .log, .toc, ...) go to report/build/,
+  // so report/ only holds your .tex, .bib and the final PDF copy.
+
+  "latex-workshop.latex.outDir": "%DIR%/build",
+
+  // pdflatex -> biber -> pdflatex -> pdflatex (same as the manual sequence)
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "pdflatex > biber > pdflatex x2",
+      "tools": ["pdflatex", "biber", "pdflatex", "pdflatex"]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first",
+
+  "latex-workshop.latex.tools": [
+    {
+      "name": "pdflatex",
+      "command": "pdflatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-output-directory=%OUTDIR%",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "biber",
+      "command": "biber",
+      "args": [
+        "--input-directory=%OUTDIR%",
+        "--output-directory=%OUTDIR%",
+        "%DOCFILE%"
+      ]
+    }
+  ],
+
+  // Build when you save, not on every keystroke
+  "latex-workshop.latex.autoBuild.run": "onSave",
+
+  // If a build fails half-way, wipe the aux files so the next one starts clean
+  "latex-workshop.latex.autoClean.run": "onFailed",
+  "latex-workshop.latex.clean.subfolder.enabled": true,
+
+  // Always build main.tex, even when saving a section file
+  "latex-workshop.latex.rootFile.useSubFile": false,
+  "latex-workshop.latex.search.rootFiles.include": ["report/main.tex"],
+
+  // Open the PDF in a VSCode tab
+  "latex-workshop.view.pdf.viewer": "tab"
+}

@@ -1,0 +1,31 @@
+\begin{table}[htbp]
+\centering
+\caption{Additional checks: Log food value}
+\label{tab:extra_log_food_ae_real}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\centering
+\begin{tabular}[t]{lcccc}
+\toprule
+   & Primary & \begin{tabular}[c]{@{}c@{}}District\\FE\end{tabular} & \begin{tabular}[c]{@{}c@{}}Cluster\\FE\end{tabular} & \begin{tabular}[c]{@{}c@{}}+ Market\\access\end{tabular}\\
+\midrule
+Crop concentration (HHI, centred) & 0.014 & -0.011 & 0.031 & 0.011\\
+ & (0.062) & (0.050) & (0.054) & (0.064)\\
+District LUC intensity (pp, centred) & -0.005 &  &  & -0.004\\
+ & (0.003) &  &  & (0.003)\\
+HHI $\times$ LUC intensity & -0.001 & 0.006 & -0.000 & -0.003\\
+ & (0.006) & (0.004) & (0.005) & (0.006)\\
+Log travel time to market (min) &  &  &  & -0.016\\
+ &  &  &  & (0.011)\\
+\midrule
+Observations & 3697 & 3697 & 3697 & 3557\\
+$R^2$ & 0.150 & 0.189 & 0.387 & 0.154\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. HHI and LUC intensity are centred on their sample means. Reference education category: never attended. District and cluster FE models absorb the LUC main effect; cluster FE also absorb urban/rural and interview timing.
+\end{minipage}
+\end{table}

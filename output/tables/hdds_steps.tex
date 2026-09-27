@@ -1,0 +1,31 @@
+\begin{table}[htbp]
+\centering
+\caption{Crop concentration, district LUC intensity and dietary diversity}
+\label{tab:hdds_steps}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\centering
+\begin{tabular}[t]{lccc}
+\toprule
+   & \begin{tabular}[c]{@{}c@{}}(1)\\Geography\end{tabular} & \begin{tabular}[c]{@{}c@{}}(2) +\\Household\end{tabular} & \begin{tabular}[c]{@{}c@{}}(3) + Land\\(primary)\end{tabular}\\
+\midrule
+Crop concentration (HHI, centred) & -0.835*** & -0.806*** & -0.515*\\
+ & (0.175) & (0.185) & (0.191)\\
+District LUC intensity (pp, centred) & 0.005 & 0.003 & 0.002\\
+ & (0.016) & (0.015) & (0.017)\\
+HHI $\times$ LUC intensity & -0.003 & 0.002 & -0.006\\
+ & (0.016) & (0.019) & (0.021)\\
+Log agricultural land (ha) &  &  & 0.218***\\
+ &  &  & (0.037)\\
+\midrule
+Observations & 3697 & 3697 & 3697\\
+$R^2$ & 0.034 & 0.145 & 0.159\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. HHI and LUC intensity are centred on their sample means. Reference education category: never attended. Food groups counted over the four EICV7 consumption visits.
+\end{minipage}
+\end{table}

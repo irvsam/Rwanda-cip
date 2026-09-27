@@ -1,4 +1,3 @@
-# ============================================================
 # run_all.R
 # Runs the full pipeline in order, from raw data to tables and
 # figures. Run from the project root (where Rwanda-cip.Rproj is):
@@ -6,7 +5,7 @@
 #
 # Setup and raw data loading happen once; each script checks what
 # is already in memory before loading anything again.
-# ============================================================
+
 
 rm(list = ls(all.names = TRUE))   # clean start, including .setup_done
 
@@ -22,11 +21,18 @@ steps <- c(
   "04c_descriptives.R",         # descriptive tables and checks
   "05_main_models.R",           # food value (distal outcome)  -> primary_models.rds
   "05b_diet_models.R",          # diet outcomes, chain table   -> diet_models.rds
-  "07_figures_maps.R"           # map and mechanism figure
+  "07_figures_maps.R",          # map and mechanism figure
+  "extra.R",
+  "tidy_tables.R"                 # final tables for the paper
 )
 
 dir.create("output", showWarnings = FALSE)
 log_file <- file.path("output", "run_log.txt")
+
+
+# run files in order ------------------------------------------------------
+
+
 sink(log_file, split = TRUE)      # printed output also goes to the log (messages stay in the console)
 
 t_start <- Sys.time()

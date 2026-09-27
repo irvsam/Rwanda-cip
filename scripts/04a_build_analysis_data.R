@@ -1,8 +1,8 @@
-# ============================================================
-# 04a_build_analysis_data.R
+
+# 04a_build_analysis_data.R --------------------
+#
 # Builds the master file: one row per EICV7 household.
-# Diet measures are added afterwards by 04b_build_diet.R, so
-# always rerun 04b after this script.
+# Diet measures are added afterwards by 04b_build_diet.R
 #
 #   - Base, outcome and household size: EICV7 poverty file
 #   - Head characteristics, composition: AHS Section 1
@@ -13,7 +13,8 @@
 #
 # Deliberately excluded: quintile, cons1ae, sol_jan and the poverty
 # variables (all built from consumption, so not valid controls).
-# ============================================================
+
+
 
 if (!exists(".setup_done"))  source("scripts/00_setup.R")
 if (!exists("poverty_data")) source("scripts/01a_load_eicv7.R")
@@ -36,7 +37,8 @@ any_yes <- function(x) {
   if (all(is.na(x))) NA_integer_ else as.integer(any(x == YES_CODE, na.rm = TRUE))
 }
 
-# Collapses s1 education into five groups:
+
+# Collapse s1 education into five groups: ----------------------
 #   Never attended            s4aq1 = No
 #   Attended, no certificate  attended, s4aq3 missing or 16 (None)
 #   Primary                   s4aq3 = 1
@@ -44,8 +46,8 @@ any_yes <- function(x) {
 #                             A3, A2, TVET III-V)
 #   Tertiary                  s4aq3 = 10-15 (A1 diplomas up to PhD)
 #   s4aq3 = 99 (Do not know) -> NA
-# Tertiary is small; merge it into "Secondary or TVET" if it causes
-# estimation problems.
+
+
 collapse_educ <- function(ever_school, diploma_code) {
   case_when(
     ever_school != EVER_SCHOOL_YES             ~ "Never attended",
@@ -64,9 +66,9 @@ EDUC_LEVELS <- c("Never attended", "Attended, no certificate", "Primary",
 # climbing bean, Irish potato, soybean, cassava, small red bean
 PRIORITY_CROPS <- c(101, 102, 104, 106, 107, 110, 122, 130, 305)
 
-# ============================================================
-# Step 1: base (EICV7 poverty file)
-# ============================================================
+# Step 1: base (EICV7 poverty file) ----------------------------
+
+# id_num() converts labelled values to numeric
 
 base <- poverty_data %>%
   transmute(
@@ -88,6 +90,8 @@ base <- poverty_data %>%
 
 check_unique(base, "Step 1 base")
 
+# 15054 unique households
+
 # Checks: deflator, food aggregate, zeros
 pov_checks <- poverty_data %>%
   transmute(
@@ -100,9 +104,9 @@ cat("Max |cons1ae / hh_index - sol_jan|:", max(abs(pov_checks$deflator_diff), na
 cat("Max |food - (exp9 + exp10 + Food_at_school)|:", max(abs(pov_checks$food_diff), na.rm = TRUE), "\n")
 cat("Households with food = 0 or NA:", sum(is.na(base$food) | base$food == 0), "\n")
 
-# ============================================================
-# Step 2: head characteristics and composition (AHS Section 1)
-# ============================================================
+
+# Step 2: head characteristics and composition (AHS Section 1) --------------------------
+
 
 members <- ahs_s1 %>%
   transmute(
@@ -153,9 +157,9 @@ check_unique(hh_head, "Step 2 head")
 cat("AHS households with no head found:",
     n_distinct(id_num(ahs_s1$hhid)) - nrow(hh_head), "\n")
 
-# ============================================================
-# Step 3: land held and AHS weight (AHS Section 2)
-# ============================================================
+
+# Step 3: land held and AHS weight (AHS Section 2) ------------------------
+
 
 land <- ahs_s2 %>%
   transmute(hhid = id_num(hhid),
@@ -174,14 +178,14 @@ cat("Households with conflicting total_agr_land values:",
 land <- select(land, -n_land_values)
 check_unique(land, "Step 3 land")
 
-# ============================================================
-# Step 4: crop concentration, Season A (AHS Section 3/4)
+
+# Step 4: crop concentration, Season A (AHS Section 3/4) --------------------------
 # Crop area = plot area x crop proportion (NISR SAS handbook, p. 22).
 # Shares use the SUM of crop areas as the denominator, because
 # proportions can exceed 100% in total where crops harvested in
 # different seasons are double counted.
 # Uses proportion (s3_q4_Xa), never density (s3_q4_Xb).
-# ============================================================
+
 
 s34 <- ahs_s34 %>% mutate(row_id = row_number())
 
@@ -240,11 +244,11 @@ check_unique(hh_crops, "Step 4 crops")
 cat("Share of households with HHI = 1 (single crop):",
     round(mean(hh_crops$crop_hhi == 1), 3), "\n")
 
-# ============================================================
-# Step 5: programme proxies (AHS Section 6)
+
+# Step 5: programme proxies (AHS Section 6) -----------------
 # For validating HHI as a proxy for LUC. NOT controls: these are
 # CIP institutions and sit on the causal path.
-# ============================================================
+
 
 programmes <- ahs_s6 %>%
   mutate(hhid = id_num(hhid)) %>%
@@ -258,19 +262,19 @@ programmes <- ahs_s6 %>%
 
 check_unique(programmes, "Step 5 programmes")
 
-# ============================================================
-# Step 6: district LUC intensity (built in 03_build_luc.R)
+
+# Step 6: district LUC intensity (built in 03_build_luc.R) ---------------------
 #   area-weighted share of agricultural land under consolidation,
 #   in percentage points; luc_intensity_A = Season A only
-# ============================================================
+
 
 dist_luc_join <- dist_luc %>% select(district_code, luc_intensity, luc_intensity_A)
 cat("Districts in base not found in dist_luc:",
     setdiff(unique(base$district_code), dist_luc_join$district_code), "\n")
 
-# ============================================================
-# Step 7: assemble
-# ============================================================
+
+# Step 7: assemble ----------------------
+
 
 master <- base %>%
   left_join(hh_comp,    by = "hhid") %>%
@@ -318,3 +322,20 @@ cat("Correlation of HHI with cooperative membership (proxy check):",
     round(cor(master$crop_hhi, master$coop, use = "complete.obs"), 3), "\n")
 
 saveRDS(master, file.path(processed_path, "master.rds"))
+
+cat("NA counts in master:\n")
+master %>%
+  summarise(across(everything(), ~ sum(is.na(.x)))) %>%
+  pivot_longer(everything(), names_to = "variable", values_to = "n_missing") %>%
+  arrange(desc(n_missing)) %>%
+  print(n = 50)
+
+cat("NA counts in master (AHS sample only):\n")
+master %>%
+  filter(in_ahs) %>%
+  summarise(across(everything(), ~ sum(is.na(.x)))) %>%
+  pivot_longer(everything(), names_to = "variable", values_to = "n_missing") %>%
+  arrange(desc(n_missing)) %>%
+  print(n = 50)
+  
+# the head diploma check is mainly null so will be doing almost nothing for the analysis

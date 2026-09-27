@@ -1,6 +1,6 @@
-# ============================================================
-# 04b_build_diet.R
-# Builds household diet measures from the EICV7 food module
+
+# 04b_build_diet.R ------------------------
+# Builds household diet measures from the EICV7 food module 
 # (CS_S8B_Food_Expenditure_Consumption) and adds them to master.rds.
 #
 # Measures (all over the four recall visits, v2-v5):
@@ -19,7 +19,7 @@
 #
 # Counts rather than values: own-produced quantities come in mixed
 # units with farmer-stated prices, so value shares add error.
-# ============================================================
+
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
 if (!exists("food"))        source("scripts/01a_load_eicv7.R")   # trimmed S8B
@@ -43,6 +43,8 @@ YES <- 1   # s8bq2 / s8bq6 / s8bq9: 1 = Yes, 2 = No (confirmed)
 #   124 mayonnaise, 125 tomato concentrate: condiments
 # Excluded (cannot be classified): 128 baby food, 129 other food
 #   items, 135 mineral water.
+
+
 food_groups <- list(
   "Cereals"                        = c(10, 11, 16:19, 23, 24, 45:54),
   "White roots and tubers"         = c(5:9, 12:15, 114, 115),

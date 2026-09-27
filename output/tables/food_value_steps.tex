@@ -1,0 +1,49 @@
+\begin{table}[htbp]
+\centering
+\caption{Crop concentration, district LUC intensity and food value}
+\label{tab:food_value_steps}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\centering
+\begin{tabular}[t]{lccc}
+\toprule
+   & \begin{tabular}[c]{@{}c@{}}(1)\\Geography\end{tabular} & \begin{tabular}[c]{@{}c@{}}(2) +\\Household\end{tabular} & \begin{tabular}[c]{@{}c@{}}(3) + Land\\(primary)\end{tabular}\\
+\midrule
+Crop concentration (HHI, centred) & -0.096 & -0.117+ & 0.014\\
+ & (0.056) & (0.064) & (0.062)\\
+District LUC intensity (pp, centred) & -0.005 & -0.005 & -0.005\\
+ & (0.003) & (0.003) & (0.003)\\
+HHI $\times$ LUC intensity & 0.006 & 0.002 & -0.001\\
+ & (0.006) & (0.006) & (0.006)\\
+Log agricultural land (ha) &  &  & 0.098***\\
+ &  &  & (0.011)\\
+Household size &  & -0.054*** & -0.068***\\
+ &  & (0.006) & (0.005)\\
+Dependency ratio &  & 0.024* & 0.035***\\
+ &  & (0.009) & (0.009)\\
+Head age &  & 0.000 & -0.001+\\
+ &  & (0.001) & (0.001)\\
+Female head &  & -0.051* & -0.029\\
+ &  & (0.020) & (0.020)\\
+Head: attended, no certificate &  & 0.058* & 0.048*\\
+ &  & (0.022) & (0.021)\\
+Head: primary &  & 0.148*** & 0.125***\\
+ &  & (0.027) & (0.027)\\
+Head: secondary or TVET &  & 0.310*** & 0.263***\\
+ &  & (0.024) & (0.026)\\
+Head: tertiary &  & 0.598*** & 0.542***\\
+ &  & (0.084) & (0.084)\\
+Rural & -0.056+ & -0.029 & -0.056+\\
+ & (0.029) & (0.026) & (0.029)\\
+\midrule
+Observations & 3697 & 3697 & 3697\\
+$R^2$ & 0.023 & 0.112 & 0.150\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. HHI and LUC intensity are centred on their sample means. Reference education category: never attended.
+\end{minipage}
+\end{table}

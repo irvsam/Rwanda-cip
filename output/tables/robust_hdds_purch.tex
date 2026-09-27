@@ -1,0 +1,29 @@
+\begin{table}[htbp]
+\centering
+\caption{Robustness: Purchased groups}
+\label{tab:robust_hdds_purch}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\centering
+\begin{tabular}[t]{lcccc}
+\toprule
+   & Primary & \begin{tabular}[c]{@{}c@{}}AHS\\weights\end{tabular} & \begin{tabular}[c]{@{}c@{}}Season\\A LUC\end{tabular} & \begin{tabular}[c]{@{}c@{}}Excl.\\HDDS = 0\end{tabular}\\
+\midrule
+Crop concentration (HHI, centred) & 0.272 & 0.457 & 0.221 & 0.349\\
+ & (0.280) & (0.336) & (0.261) & (0.291)\\
+District LUC intensity (pp, centred) & 0.005 & 0.007 & 0.009 & 0.005\\
+ & (0.028) & (0.057) & (0.009) & (0.027)\\
+HHI $\times$ LUC intensity & -0.051+ & -0.001 & -0.029* & -0.047+\\
+ & (0.025) & (0.087) & (0.013) & (0.025)\\
+\midrule
+Observations & 3697 & 3697 & 3697 & 3692\\
+$R^2$ & 0.155 & 0.166 & 0.157 & 0.159\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. HHI and LUC intensity are centred on their sample means. Reference education category: never attended. Food groups counted over the four EICV7 consumption visits.
+\end{minipage}
+\end{table}

@@ -1,5 +1,5 @@
-# ============================================================
-# 01b_load_ahs.R
+
+# -------------- 01b_load_ahs.R ----------------------------
 # Load the raw AHS 2024 files used to build the master file.
 #
 #   ahs_s1  : household members (head characteristics, composition)
@@ -10,11 +10,13 @@
 # Also checks that AHS households match EICV7 on hhid. With
 # CHECK_LABELS = TRUE (set in 00_setup.R or before sourcing), it
 # prints the value labels behind the codes used in 04a.
-# ============================================================
+
+
 
 if (!exists(".setup_done"))  source("scripts/00_setup.R")
 if (!exists("poverty_data")) source("scripts/01a_load_eicv7.R")
 
+# ------------ load in ahs data -----------------------
 ahs_dir <- file.path(data_path, "AHS 2024")
 
 ahs_s1  <- read_dta(file.path(ahs_dir, "AHS2024_Section1_HOUSEHOLD MEMBERS CHARACTERISTICS.dta"))
@@ -34,18 +36,19 @@ join_check <- imap_dfr(
   }
 )
 print(join_check)
-# Expected: 3,724 households (3,717 in s34), all matched
+# Expected: 3,724 households (3,717 in s34), all matched.. PASSED
+
 
 # ---- Codes behind 04a (confirmed; print only when checking) ----
 if (isTRUE(CHECK_LABELS)) {
-  print(val_labels(ahs_s1$s1q2))    # relationship to head: which is "head"?
-  print(val_labels(ahs_s1$s1q1))    # sex: which is "female"?
-  print(val_labels(ahs_s1$s1q14))   # household membership: which codes are current members?
-  print(val_labels(ahs_s1$s4aq1))   # ever attended school: which is "yes"?
+  print(val_labels(ahs_s1$s1q2))    # relationship to head: which is "head"? head is 1
+  print(val_labels(ahs_s1$s1q1))    # sex: which is "female"? female is 2
+  print(val_labels(ahs_s1$s1q14))   # household membership: which codes are current members? yes = 1
+  print(val_labels(ahs_s1$s4aq1))   # ever attended school: which is "yes"? yes = 1
   print(val_labels(ahs_s1$s4aq3))   # highest diploma: used to collapse education
-  print(val_labels(ahs_s34$Season)) # which code is Season A?
-  print(val_labels(ahs_s2$s2q2a))   # plot land use: what are 96 and 99?
-  print(val_labels(ahs_s6$s6q10))   # cooperative membership: which is "yes"?
+  print(val_labels(ahs_s34$Season)) # which code is Season A? a is 1
+  print(val_labels(ahs_s2$s2q2a))   # plot land use: what are 96 and 99? 96 = agricultural, 99 = building, 95 = forest
+  print(val_labels(ahs_s6$s6q10))   # cooperative membership: which is "yes"? yes = 1
   print(val_labels(ahs_s34$s3_q4_1)) # crop codes: do they match the SAS list (101 maize etc.)?
 }
 

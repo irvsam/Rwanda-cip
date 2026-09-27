@@ -1,15 +1,11 @@
-# ============================================================
-# 05_main_models.R
-# Food value per adult equivalent: the most distal outcome in the
-# mechanism chain (05b runs the diet outcomes with the identical
-# sample and specification).
+# 05_main_models.R ----------------------------------
 #
 # Outcome: log real food consumption per adult equivalent
 #   (food / ae / hh_index, January 2024 prices).
 # Specification: HHI x district LUC intensity, predetermined
 #   controls including land (CONTROLS in 00_setup.R).
 # Inference: CR2 cluster-robust SEs by district.
-# ============================================================
+
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
 master  <- readRDS(file.path(processed_path, "master.rds"))
