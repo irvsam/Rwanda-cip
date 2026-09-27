@@ -23,6 +23,7 @@
         "-interaction=nonstopmode",
         "-file-line-error",
         "-output-directory=%OUTDIR%",
+        "-shell-escape",
         "%DOC%"
       ]
     },
