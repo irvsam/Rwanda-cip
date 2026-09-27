@@ -1,4 +1,3 @@
-
 # 04b_build_diet.R ------------------------
 # Builds household diet measures from the EICV7 food module 
 # (CS_S8B_Food_Expenditure_Consumption) and adds them to master.rds.
@@ -14,8 +13,14 @@
 #                    (vegetables, fruit, meat, eggs, fish, dairy),
 #                    closest to the groups Del Prete et al. (2019)
 #                    found were lost under consolidation
+#   hdds_asf       : number of the four animal-source groups consumed
+#                    (meat, eggs, fish, dairy); exploratory, added
+#                    after the main results
 #   purch_share    : share of consumed items that were purchased at
 #                    least once (market dependence, count-based)
+#
+# Also saves hh_groups.rds (household x food group, eaten 0/1) for
+# the per-group models in 05b.
 #
 # Counts rather than values: own-produced quantities come in mixed
 # units with farmer-stated prices, so value shares add error.
@@ -63,6 +68,7 @@ EXCLUDED_ITEMS <- c(128, 129, 135)
 
 NONSTAPLE_GROUPS <- c("Vegetables", "Fruits", "Meat", "Eggs", "Fish",
                       "Milk and milk products")
+ASF_GROUPS       <- c("Meat", "Eggs", "Fish", "Milk and milk products")
 
 item_map <- enframe(food_groups, name = "group", value = "item") %>%
   unnest(item)
@@ -95,6 +101,9 @@ rows_per_hh <- count(food, hhid)
 stopifnot(all(rows_per_hh$n == 148))   # every household asked all 148 items
 
 # ---- Household-level measures --------------------------------
+DIET_VARS <- c("hdds", "hdds_purch", "hdds_own", "hdds_nonstaple", "hdds_asf",
+               "n_items", "purch_share")
+
 diet <- items %>%
   group_by(hhid) %>%
   summarise(
@@ -102,6 +111,7 @@ diet <- items %>%
     hdds_purch     = n_distinct(group[purchased]),
     hdds_own       = n_distinct(group[own & consumed]),
     hdds_nonstaple = n_distinct(group[consumed & group %in% NONSTAPLE_GROUPS]),
+    hdds_asf       = n_distinct(group[consumed & group %in% ASF_GROUPS]),
     n_items        = sum(consumed),
     purch_share    = if (sum(consumed) > 0) sum(consumed & purchased) / sum(consumed)
     else NA_real_,
@@ -110,15 +120,25 @@ diet <- items %>%
   ) %>%
   # households with no answered consumption questions are missing,
   # not households that ate nothing
-  mutate(across(c(hdds, hdds_purch, hdds_own, hdds_nonstaple, n_items, purch_share),
-                ~ if_else(any_answered, as.numeric(.x), NA_real_)))
+  mutate(across(all_of(DIET_VARS), ~ if_else(any_answered, as.numeric(.x), NA_real_)))
 
 cat("Households with no answered consumption items (set to NA):",
     sum(!diet$any_answered), "\n")
+no_answer_ids <- diet$hhid[!diet$any_answered]
 diet <- select(diet, -any_answered)
 
 stopifnot(!any(duplicated(diet$hhid)))
 cat("\nDiet measures built for", nrow(diet), "households\n")
+
+# ---- Household x food group flags (for the per-group models) ----
+hh_groups <- items %>%
+  filter(consumed) %>%
+  distinct(hhid, group) %>%
+  mutate(eaten = 1L) %>%
+  complete(hhid = diet$hhid, group = names(food_groups), fill = list(eaten = 0L)) %>%
+  filter(!hhid %in% no_answer_ids)            # missing, not zero
+stopifnot(nrow(hh_groups) == (nrow(diet) - length(no_answer_ids)) * length(food_groups))
+saveRDS(hh_groups, file.path(processed_path, "hh_groups.rds"))
 
 # ---- Checks --------------------------------------------------
 cat("\nHDDS distribution:\n")
@@ -126,6 +146,9 @@ print(count(diet, hdds))
 
 cat("\nNon-staple diversity distribution:\n")
 print(count(diet, hdds_nonstaple))
+
+cat("\nAnimal-source diversity distribution:\n")
+print(count(diet, hdds_asf))
 
 # ---- Add to master -------------------------------------------
 master <- master %>%
@@ -142,7 +165,7 @@ cat("Correlation of HDDS with log food per ae (full sample):",
 
 master %>%
   filter(in_ahs) %>%
-  summarise(across(c(hdds, hdds_purch, hdds_own, hdds_nonstaple, purch_share),
+  summarise(across(c(hdds, hdds_purch, hdds_own, hdds_nonstaple, hdds_asf, purch_share),
                    list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE)))) %>%
   pivot_longer(everything()) %>%
   print(n = Inf)

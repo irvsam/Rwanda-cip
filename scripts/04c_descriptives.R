@@ -1,4 +1,3 @@
-
 # 04c_descriptives.R
 # Descriptive statistics for the primary (AHS) estimation sample,
 # plus the checks reported in the research design section.
@@ -19,8 +18,8 @@ desc_vars <- primary %>%
     `Non-staple food groups (0-6)`                    = hdds_nonstaple,
     `Food consumption per AE, Jan 2024 prices (RWF)`  = food_ae_real,
     # Explanatory variables
-    `Crop concentration (HHI, Season A)`              = crop_hhi,
-    `Number of crops, Season A`                       = n_crops,
+    `Crop concentration (HHI, Seasons A and B)`              = crop_hhi,
+    `Number of crops, Seasons A and B`                       = n_crops,
     `Share of crop area in CIP priority crops`        = prio_share,
     `District LUC intensity (pp)`                     = luc_intensity,
     # Controls

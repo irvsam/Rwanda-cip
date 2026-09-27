@@ -1,5 +1,5 @@
 
-# 08_tidy_tables.R ---------------------
+
 # Post-processes the modelsummary/kableExtra tables in
 # output_tables_path so they can be \input{} without hand edits
 # (which are lost every time 05/05b rerun):

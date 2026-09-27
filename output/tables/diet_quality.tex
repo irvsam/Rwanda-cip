@@ -1,0 +1,31 @@
+\begin{table}[htbp]
+\centering
+\caption{Crop concentration and diet quality}
+\label{tab:diet_quality}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\centering
+\begin{tabular}[t]{lcc}
+\toprule
+   & \begin{tabular}[c]{@{}c@{}}Non-staple\\groups (0-6)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Animal-source\\groups (0-4)\end{tabular}\\
+\midrule
+Crop concentration (HHI, centred) & -0.176 & -0.055\\
+ & (0.149) & (0.136)\\
+District LUC intensity (pp, centred) & 0.020 & 0.013\\
+ & (0.015) & (0.013)\\
+HHI $\times$ LUC intensity & -0.114* & -0.123*\\
+ & (0.043) & (0.050)\\
+Log agricultural land (ha) & 0.150*** & 0.109***\\
+ & (0.024) & (0.020)\\
+\midrule
+Observations & 3715 & 3715\\
+$R^2$ & 0.144 & 0.132\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. HHI and LUC intensity are centred on their sample means. Reference education category: never attended. Food groups counted over the four EICV7 consumption visits. Animal-source groups: meat, eggs, fish, and milk and milk products.
+\end{minipage}
+\end{table}

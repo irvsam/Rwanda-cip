@@ -25,12 +25,15 @@ main_models <- list(
 walk(main_models, ~ print(summary(.x)$coefficients[names(KEY_LABELS)[1:3], ]))
 
 # ---- Robustness ----------------------------------------------
-primary_A <- primary %>% mutate(luc_c = luc_A_c)   # Season A moderator
+primary_A <- primary %>%
+  filter(!is.na(crop_hhi_A)) %>%
+  mutate(crop_hhi_c = crop_hhi_A - mean(crop_hhi_A),
+         luc_c      = luc_intensity_A - mean(luc_intensity_A))
 
 robust_models <- list(
   "Primary"         = main_models[["(3) + Land (primary)"]],
   "AHS weights"     = fit_cl(make_f(y), primary, weights = wt_ahs),
-  "Season A LUC"    = fit_cl(make_f(y), primary_A),
+  "Season A only"   = fit_cl(make_f(y), primary_A),
   "Nominal outcome" = fit_cl(make_f("log_food_ae_nominal"), primary)
 )
 
@@ -61,7 +64,7 @@ modelsummary(
 
 modelsummary(
   robust_models, coef_map = KEY_LABELS[1:3], gof_map = c("nobs", "r.squared"),
-  stars = TRUE, notes = STEP_NOTES,
+  stars = TRUE, notes = TABLE_NOTES,
   title = "Robustness: food value",
   output = file.path(output_tables_path, "food_value_robust.tex")
 )

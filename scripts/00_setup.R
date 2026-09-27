@@ -152,6 +152,3 @@ STEP_NOTES <- paste(
 
 .setup_done <- TRUE
 message("Setup complete")
-
-
-

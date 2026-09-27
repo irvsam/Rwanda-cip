@@ -1,4 +1,3 @@
-
 # 04a_build_analysis_data.R --------------------
 #
 # Builds the master file: one row per EICV7 household.
@@ -7,7 +6,7 @@
 #   - Base, outcome and household size: EICV7 poverty file
 #   - Head characteristics, composition: AHS Section 1
 #   - Land held and AHS weight: AHS Section 2
-#   - Crop concentration (Season A): AHS Section 3/4
+#   - Crop concentration (pooled Seasons A and B; Season A only as a check): AHS Section 3/4
 #   - Programme proxies (validation only, NOT controls): AHS Section 6
 #   - District LUC intensity: dist_luc.rds (from the SAS script)
 #
@@ -178,8 +177,7 @@ cat("Households with conflicting total_agr_land values:",
 land <- select(land, -n_land_values)
 check_unique(land, "Step 3 land")
 
-
-# Step 4: crop concentration, Season A (AHS Section 3/4) --------------------------
+# Step 4: crop concentration, pooled Seasons A and B (AHS Section 3/4) --------------------------
 # Crop area = plot area x crop proportion (NISR SAS handbook, p. 22).
 # Shares use the SUM of crop areas as the denominator, because
 # proportions can exceed 100% in total where crops harvested in
@@ -208,8 +206,8 @@ crop_props <- s34 %>%
   pivot_longer(-row_id, names_to = "slot", names_pattern = "s3_q4_(\\d)a",
                values_to = "prop")
 
-crops_A <- plots %>%
-  filter(season == SEASON_A_CODE) %>%
+crops_all <- plots %>%
+  
   inner_join(crop_codes, by = "row_id") %>%
   left_join(crop_props, by = c("row_id", "slot")) %>%
   filter(!is.na(crop), !is.na(prop), prop > 0,
@@ -217,28 +215,38 @@ crops_A <- plots %>%
   mutate(crop_area = area_sqm * prop / 100)
 
 # How often do proportions on a plot sum above 100%?
-crops_A %>%
+crops_all %>%
   group_by(row_id) %>%
   summarise(total_prop = sum(prop), .groups = "drop") %>%
   summarise(plots = n(), over_100 = sum(total_prop > 100)) %>%
   print()
 
-hh_crops <- crops_A %>%
-  group_by(hhid, crop) %>%                 # same crop on several plots is summed
-  summarise(crop_area = sum(crop_area), .groups = "drop_last") %>%
-  mutate(share = crop_area / sum(crop_area)) %>%
-  summarise(crop_hhi   = sum(share^2),
-            n_crops    = n(),
-            # share of Season A crop area under CIP priority crops
-            prio_share = sum(crop_area[crop %in% PRIORITY_CROPS]) / sum(crop_area),
-            # is the household's largest crop a priority crop?
-            top_crop_prio = as.integer(crop[which.max(crop_area)] %in% PRIORITY_CROPS),
-            .groups    = "drop")
+SEASON_B_CODE <- 2
 
-hh_area_A <- crops_A %>%
-  distinct(hhid, row_id, area_sqm) %>%     # each plot counted once
+build_hhi <- function(crops, seasons) {
+  crops %>%
+    filter(season %in% seasons) %>%
+    group_by(hhid, crop) %>%
+    summarise(crop_area = sum(crop_area), .groups = "drop_last") %>%
+    mutate(share = crop_area / sum(crop_area)) %>%
+    summarise(crop_hhi      = sum(share^2),
+              n_crops       = n(),
+              prio_share    = sum(crop_area[crop %in% PRIORITY_CROPS]) / sum(crop_area),
+              top_crop_prio = as.integer(crop[which.max(crop_area)] %in% PRIORITY_CROPS),
+              .groups = "drop")
+}
+
+hh_crops   <- build_hhi(crops_all, c(SEASON_A_CODE, SEASON_B_CODE))   # primary
+hh_crops_A <- build_hhi(crops_all, SEASON_A_CODE) %>%
+  select(hhid, crop_hhi_A = crop_hhi)                                 # check
+
+hh_area <- crops_all %>%
+  filter(season %in% c(SEASON_A_CODE, SEASON_B_CODE)) %>%
+  distinct(hhid, season, row_id, area_sqm) %>%
+  group_by(hhid, season) %>%
+  summarise(ha = sum(area_sqm) / 10000, .groups = "drop") %>%
   group_by(hhid) %>%
-  summarise(area_A_ha = sum(area_sqm) / 10000, .groups = "drop")
+  summarise(area_max_season_ha = max(ha), .groups = "drop")
 
 check_unique(hh_crops, "Step 4 crops")
 cat("Share of households with HHI = 1 (single crop):",
@@ -281,7 +289,8 @@ master <- base %>%
   left_join(hh_head,    by = "hhid") %>%
   left_join(land,       by = "hhid") %>%
   left_join(hh_crops,   by = "hhid") %>%
-  left_join(hh_area_A,  by = "hhid") %>%
+  left_join(hh_crops_A, by = "hhid") %>%
+  left_join(hh_area,    by = "hhid") %>%
   left_join(programmes, by = "hhid") %>%
   left_join(dist_luc_join, by = "district_code") %>%
   mutate(
@@ -301,14 +310,14 @@ cat("\nPrimary (AHS) sample:", sum(master$in_ahs), "households\n")
 cat("\nMissing values within the AHS sample:\n")
 master %>%
   filter(in_ahs) %>%
-  summarise(across(c(log_food_ae_real, crop_hhi, prio_share, luc_intensity, log_land,
+  summarise(across(c(log_food_ae_real, crop_hhi, crop_hhi_A, prio_share, luc_intensity, log_land,
                      hh_size, dep_ratio, head_age, head_female, head_educ,
                      wt_ahs), ~ sum(is.na(.x)))) %>%
   pivot_longer(everything(), names_to = "variable", values_to = "n_missing") %>%
   print()
 
-cat("\nSeason A area larger than land held (should be rare):",
-    sum(master$area_A_ha > master$land_ha * 1.05, na.rm = TRUE), "\n")
+cat("\nLargest single-season area above land held (should be rare):",
+    sum(master$area_max_season_ha > master$land_ha * 1.05, na.rm = TRUE), "\n")
 
 cat("Correlation, nominal vs real log food per ae:",
     round(cor(master$log_food_ae_nominal, master$log_food_ae_real,
@@ -337,5 +346,5 @@ master %>%
   pivot_longer(everything(), names_to = "variable", values_to = "n_missing") %>%
   arrange(desc(n_missing)) %>%
   print(n = 50)
-  
+
 # the head diploma check is mainly null so will be doing almost nothing for the analysis

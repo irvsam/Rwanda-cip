@@ -34,3 +34,4 @@ if (isTRUE(CHECK_LABELS)) {
 }
 
 message("EICV7 loaded: ", nrow(poverty_data), " households")
+

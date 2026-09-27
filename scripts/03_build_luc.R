@@ -1,12 +1,9 @@
-
 # 03_build_luc.R ------------------------------------------------------
-# Construct the district-level LUC intensity variable from
-# SAS 2024: area-weighted share of agricultural land under
-# consolidation (plot area x SAS plot weight, NISR SAS metadata
-# handbook), in percentage points.
-#   luc_intensity   : mean of Seasons A, B and C (primary moderator)
-#   luc_intensity_A : Season A only, matching the AHS crop season
-# Also caches the district boundary shapefile for the map in 07.
+#   luc_intensity   : pooled Seasons A and B, area-weighted (primary moderator)
+#   luc_intensity_A : Season A only (check)
+#   Season C is processed but not used: its SAS sample covers only
+#   wetland, volcanic-zone and irrigated sites (SAS 2024 report, 2.1.4)
+#   Plots are deduplicated first: the screening file has one row per crop.
 
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
@@ -22,6 +19,8 @@ sas_c <- read_dta(file.path(data_path, "SAS 2024/Season C/Rwa_raw_SeasonC2024_Sc
 
 # select only what is needed -------------------------------
 # Columns needed: segment id, district (s1q2), plot type (s2q6), LUC response (s2q12), plot size, and plot weight.
+# Mixed plots (0.23% of Season A area): LUC if any row says LUC ("any").
+# The stricter "all" rule moves one district by at most 2.8 pp.
 clean_sas <- function(df, rule = c("any", "all")) {
   rule <- match.arg(rule)
   agg  <- if (rule == "any") any else all
@@ -61,10 +60,9 @@ luc_seasons <- bind_rows(
 dist_luc <- luc_seasons %>%
   group_by(s1q2) %>%
   summarise(
-    luc_intensity   = mean(seasonal_intensity, na.rm = TRUE),
-    luc_intensity_A = first(seasonal_intensity[season == "A"]),
-    luc_intensity_B = first(seasonal_intensity[season == "B"]),
-    luc_intensity_C = first(seasonal_intensity[season == "C"]),
+    luc_intensity   = 100 * sum(luc_ha_est[season %in% c("A", "B")]) /
+      sum(total_ha_est[season %in% c("A", "B")]),   # primary: pooled A+B
+    luc_intensity_A = seasonal_intensity[season == "A"],                   # check: Season A
     district_code   = as.numeric(first(s1q2)),
     .groups = "drop"
   )
@@ -90,5 +88,3 @@ if (!file.exists(rwa_map_path)) {
 } else {
   message("rwa_map.rds already exists, skipping download.")
 }
-
-
