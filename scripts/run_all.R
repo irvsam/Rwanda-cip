@@ -19,10 +19,11 @@ steps <- c(
   "04a_build_analysis_data.R",  # master file                  -> master.rds
   "04b_build_diet.R",           # diet measures added          -> master.rds
   "04c_descriptives.R",         # descriptive tables and checks
-  "05_main_models.R",           # food value (distal outcome)  -> primary_models.rds
-  "05b_diet_models.R",          # diet outcomes, chain table   -> diet_models.rds
+  "05_main_models.R",           # plain HHI, food value         -> primary_models.rds
+  "05b_diet_models.R",          # plain HHI, diet outcomes      -> diet_models.rds
   "05c_village_fe.R",           # village fixed effects        -> village_fe_models.rds
-  "05d_priority_split.R",
+  "05d_priority_split.R",       # PRIMARY: split models        -> split_models.rds
+  "05e_robustness_split.R",     # robustness for split design  -> split_robust.rds
   "07_figures_maps.R",          # map and mechanism figure
   "extra.R",
   "tidy_tables.R"                 # final tables for the paper

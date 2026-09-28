@@ -1,0 +1,33 @@
+\begin{table}[htbp]
+\centering
+\caption{Robustness: Animal-source groups}
+\label{tab:robust_split_hdds_asf}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\centering
+\begin{tabular}[t]{lcccc}
+\toprule
+   & Primary & \begin{tabular}[c]{@{}c@{}}AHS\\weights\end{tabular} & \begin{tabular}[c]{@{}c@{}}Season\\A only\end{tabular} & \begin{tabular}[c]{@{}c@{}}Excl.\\HDDS = 0\end{tabular}\\
+\midrule
+Priority-crop concentration (centred) & -0.076 & 0.211 & -0.158 & -0.062\\
+ & (0.138) & (0.162) & (0.110) & (0.139)\\
+Non-priority concentration (centred) & 0.022 & 0.175 & -0.139 & 0.033\\
+ & (0.207) & (0.225) & (0.163) & (0.207)\\
+District LUC intensity (pp, centred) & 0.013 & 0.008 & 0.011 & 0.013\\
+ & (0.013) & (0.014) & (0.013) & (0.013)\\
+Priority $\times$ LUC intensity & -0.118+ & -0.165* & -0.061 & -0.120+\\
+ & (0.053) & (0.065) & (0.036) & (0.053)\\
+Non-priority $\times$ LUC intensity & -0.147* & -0.175* & -0.100* & -0.148*\\
+ & (0.052) & (0.063) & (0.045) & (0.052)\\
+\midrule
+Observations & 3715 & 3715 & 3697 & 3710\\
+$R^2$ & 0.132 & 0.147 & 0.131 & 0.133\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. Crop concentration (HHI, Seasons A and B) is split into the part from CIP priority crops and the part from all other crops; the two sum to the HHI. Both parts and LUC intensity are centred on their sample means. Reference education category: never attended. Food groups counted over the four EICV7 consumption visits. Season A only: both parts of HHI and LUC intensity measured in Season A.
+\end{minipage}
+\end{table}

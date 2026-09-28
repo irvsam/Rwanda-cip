@@ -16,9 +16,12 @@ desc_vars <- primary %>%
     `Purchased food groups`                           = hdds_purch,
     `Dietary diversity (HDDS, 0-12)`                  = hdds,
     `Non-staple food groups (0-6)`                    = hdds_nonstaple,
+    `Animal-source food groups (0-4)`                 = hdds_asf,
     `Food consumption per AE, Jan 2024 prices (RWF)`  = food_ae_real,
     # Explanatory variables
-    `Crop concentration (HHI, Seasons A and B)`              = crop_hhi,
+    `Crop concentration (HHI, Seasons A and B)`       = crop_hhi,
+    `HHI: priority-crop part`                        = hhi_prio,
+    `HHI: non-priority part`                         = hhi_nonprio,
     `Number of crops, Seasons A and B`                       = n_crops,
     `Share of crop area in CIP priority crops`        = prio_share,
     `District LUC intensity (pp)`                     = luc_intensity,
@@ -86,3 +89,9 @@ cat("Correlation of HHI with priority-crop share:",
 cat("Correlation of HDDS with log food per AE:",
     round(cor(primary$hdds, primary$log_food_ae_real, use = "complete.obs"), 3), "\n")
 cat("AHS households with HDDS = 0:", sum(primary$hdds == 0, na.rm = TRUE), "\n")
+cat("\nPriority and non-priority parts of HHI:\n")
+primary %>%
+  summarise(across(c(hhi_prio, hhi_nonprio), list(mean = mean, sd = sd)),
+            share_of_hhi_prio = mean(hhi_prio) / mean(crop_hhi),
+            r = cor(hhi_prio, hhi_nonprio)) %>%
+  print(width = Inf)

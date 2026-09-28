@@ -12,6 +12,7 @@ library(estimatr)      # lm_robust(), CR2 cluster-robust SEs
 library(lme4)
 library(lmerTest)      # Satterthwaite p-values for lmer()
 library(modelsummary)
+library(clubSandwich)  # CR2 Satterthwaite df for marginal effects
 library(kableExtra)
 
 # ---- Paths -------------------------------------------------
@@ -52,23 +53,7 @@ check_unique <- function(df, name) {
   message(name, ": ", nrow(df), " households, hhid unique")
 }
 
-
-
 # Model helpers (used by 05 and 05b so both use the identical sample, centring, specification and inference)  --------------
-
-# Split: each part of HHI gets its own slope and LUC interaction
-make_f_split <- function(outcome, controls = CONTROLS) {
-  reformulate(c("hhi_prio_c * luc_c", "hhi_nonprio_c * luc_c", controls),
-              response = outcome)
-}
-
-# Same model, reparametrised: the hhi_prio_c coefficient is now the
-# DIFFERENCE between the priority and non-priority slopes, with its own
-# CR2 test
-make_f_diff <- function(outcome, controls = CONTROLS) {
-  reformulate(c("crop_hhi_c * luc_c", "hhi_prio_c * luc_c", controls),
-              response = outcome)
-}
 
 # Primary estimation sample: AHS households, HHI and LUC centred on
 # this sample
@@ -77,11 +62,24 @@ make_primary <- function(master) {
   master %>%
     filter(in_ahs) %>%
     mutate(
-      crop_hhi_c = crop_hhi        - mean(crop_hhi),
-      luc_c      = luc_intensity   - mean(luc_intensity),
-      luc_A_c    = luc_intensity_A - mean(luc_intensity_A),
-      hhi_prio_c    = hhi_prio    - mean(hhi_prio),
-      hhi_nonprio_c = hhi_nonprio - mean(hhi_nonprio)
+      crop_hhi_c    = crop_hhi        - mean(crop_hhi),
+      hhi_prio_c    = hhi_prio        - mean(hhi_prio),
+      hhi_nonprio_c = hhi_nonprio     - mean(hhi_nonprio),
+      luc_c         = luc_intensity   - mean(luc_intensity),
+      luc_A_c       = luc_intensity_A - mean(luc_intensity_A)
+    )
+}
+
+# Season A check sample: HHI (both parts) and LUC measured in Season A,
+# recentred on this sample
+make_season_A <- function(primary) {
+  primary %>%
+    filter(!is.na(crop_hhi_A)) %>%
+    mutate(
+      crop_hhi_c    = crop_hhi_A      - mean(crop_hhi_A),
+      hhi_prio_c    = hhi_prio_A      - mean(hhi_prio_A),
+      hhi_nonprio_c = hhi_nonprio_A   - mean(hhi_nonprio_A),
+      luc_c         = luc_intensity_A - mean(luc_intensity_A)
     )
 }
 
@@ -92,6 +90,36 @@ CONTROLS     <- c(CONTROLS_GEO, CONTROLS_HH, "log_land")
 
 make_f <- function(outcome, controls = CONTROLS) {
   reformulate(c("crop_hhi_c * luc_c", controls), response = outcome)
+}
+
+# ---- Priority split (primary design) ------------------------
+# HHI = priority part + non-priority part (sums of squared shares of
+# priority and non-priority crops). Terms are written out in full so the
+# interaction names are fixed: "hhi_nonprio_c:luc_c", not "luc_c:hhi_nonprio_c".
+SPLIT_TERMS <- c("hhi_prio_c", "hhi_nonprio_c", "luc_c",
+                 "hhi_prio_c:luc_c", "hhi_nonprio_c:luc_c")
+
+make_f_split <- function(outcome, controls = CONTROLS) {
+  reformulate(c(SPLIT_TERMS, controls), response = outcome)
+}
+
+# Same model, reparametrised (HHI = prio + nonprio): the hhi_prio_c
+# coefficient is the priority slope MINUS the non-priority slope, and
+# hhi_prio_c:luc_c the difference between their LUC interactions
+DIFF_TERMS <- c("crop_hhi_c", "hhi_prio_c", "luc_c",
+                "crop_hhi_c:luc_c", "hhi_prio_c:luc_c")
+
+make_f_diff <- function(outcome, controls = CONTROLS) {
+  reformulate(c(DIFF_TERMS, controls), response = outcome)
+}
+
+# Village fixed effects version: province, urban/rural and the LUC main
+# effect are constant within a village, so they are left out
+make_f_split_vfe <- function(outcome) {
+  reformulate(c("hhi_prio_c", "hhi_nonprio_c",
+                "hhi_prio_c:luc_c", "hhi_nonprio_c:luc_c",
+                setdiff(CONTROLS, CONTROLS_GEO), "factor(clust)"),
+              response = outcome)
 }
 
 # OLS with CR2 standard errors clustered by district
@@ -105,9 +133,54 @@ fit_ml <- function(f, data) {
        control = lmerControl(optimizer = "bobyqa"))
 }
 
-# Marginal effect of HHI at the 10th, 50th and 90th percentiles of
-# district LUC, in outcome units for a one-SD increase in HHI.
-# CIs use a t critical value with (clusters - 1) = 29 df
+# Random slopes for BOTH parts of HHI (Heisig & Schaeffer, 2019)
+fit_ml_split <- function(f, data) {
+  lmer(update(f, . ~ . + (1 + hhi_prio_c + hhi_nonprio_c | district_code)),
+       data = data, control = lmerControl(optimizer = "bobyqa"))
+}
+
+# Marginal effect of each part of HHI at the 10th, 50th and 90th
+# percentiles of district LUC, per one-SD increase in that part.
+# Refits the model with lm() so clubSandwich can give CR2 standard
+# errors WITH Satterthwaite df for each combination (slope + L x
+# interaction), instead of a fixed 29 df.
+slope_at_split <- function(outcome, data, controls = CONTROLS) {
+  d   <- data %>% filter(!is.na(.data[[outcome]]))
+  fit <- lm(make_f_split(outcome, controls), data = d)
+  V   <- vcovCR(fit, cluster = d$district_code, type = "CR2")
+  b   <- coef(fit)
+  luc_mean <- mean(d$luc_intensity)
+  
+  pct <- d %>%
+    distinct(district_code, luc_intensity) %>%
+    summarise(p10 = quantile(luc_intensity, 0.10),
+              p50 = quantile(luc_intensity, 0.50),
+              p90 = quantile(luc_intensity, 0.90)) %>%
+    pivot_longer(everything(), names_to = "luc_pctile", values_to = "luc_intensity")
+  
+  parts <- c(Priority = "hhi_prio", `Non-priority` = "hhi_nonprio")
+  
+  expand_grid(pct, part = names(parts)) %>%
+    mutate(raw = parts[part], L = luc_intensity - luc_mean) %>%
+    pmap_dfr(function(luc_pctile, luc_intensity, part, raw, L) {
+      cvec <- setNames(rep(0, length(b)), names(b))
+      cvec[paste0(raw, "_c")]       <- 1
+      cvec[paste0(raw, "_c:luc_c")] <- L
+      lc <- linear_contrast(fit, vcov = V, test = "Satterthwaite",
+                            contrasts = matrix(cvec, nrow = 1,
+                                               dimnames = list(NULL, names(b))))
+      sd_part <- sd(d[[raw]])
+      tibble(outcome = outcome, part = part, luc_pctile = luc_pctile,
+             luc_intensity = luc_intensity, slope = lc$Est, se = lc$SE, df = lc$df,
+             effect_1sd = lc$Est  * sd_part,
+             low_1sd    = lc$CI_L * sd_part,
+             high_1sd   = lc$CI_U * sd_part)
+    })
+}
+
+# Plain-HHI version (comparison models in 05 and 05b).
+# NOTE: CIs use a fixed 29 df, which is too narrow; slope_at_split()
+# above uses Satterthwaite df and is the one used for the paper figures.
 slope_at <- function(model, data, hhi = "crop_hhi_c", int = "crop_hhi_c:luc_c") {
   b <- coef(model)
   V <- vcov(model)
@@ -140,6 +213,20 @@ KEY_LABELS <- c(
   "log_land"         = "Log agricultural land (ha)"
 )
 
+SPLIT_LABELS <- c(
+  "hhi_prio_c"          = "Priority-crop concentration (centred)",
+  "hhi_nonprio_c"       = "Non-priority concentration (centred)",
+  "luc_c"               = "District LUC intensity (pp, centred)",
+  "hhi_prio_c:luc_c"    = "Priority x LUC intensity",
+  "hhi_nonprio_c:luc_c" = "Non-priority x LUC intensity",
+  "log_land"            = "Log agricultural land (ha)"
+)
+
+DIFF_LABELS <- c(
+  "hhi_prio_c"       = "Priority minus non-priority slope",
+  "hhi_prio_c:luc_c" = "Priority minus non-priority, x LUC intensity"
+)
+
 ALL_LABELS <- c(
   KEY_LABELS,
   "hh_size"                           = "Household size",
@@ -158,6 +245,16 @@ TABLE_NOTES <- paste(
   "All models include province fixed effects, urban/rural, household size,",
   "dependency ratio, head age, sex and education, and log land held.",
   "HHI and LUC intensity are centred on their sample means.",
+  "Reference education category: never attended."
+)
+
+SPLIT_NOTES <- paste(
+  "CR2 standard errors clustered by district (30 clusters) in parentheses.",
+  "All models include province fixed effects, urban/rural, household size,",
+  "dependency ratio, head age, sex and education, and log land held.",
+  "Crop concentration (HHI, Seasons A and B) is split into the part from CIP priority crops",
+  "and the part from all other crops; the two sum to the HHI.",
+  "Both parts and LUC intensity are centred on their sample means.",
   "Reference education category: never attended."
 )
 

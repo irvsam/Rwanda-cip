@@ -1,15 +1,13 @@
-
-
 # binscatter --------------------------------------------------------------
-# Figure 2: crop concentration and diets in the raw data.
-# Own-produced groups, purchased groups and HDDS by HHI decile,
-# in low- vs high-LUC districts (split at the district median).
+# Figure 2: priority-crop concentration and diets in the raw data.
+# Own-produced groups, purchased groups and non-staple groups by
+# QUINTILE of the priority part of HHI, in low- vs high-LUC districts
+# (split at the district median).
 #
-# Outcomes are residualised on the full control set (CONTROLS,
-# as in the primary models) and shown relative to the sample
-# average, on a SHARED y-axis so magnitudes stay comparable
-# across outcomes. No CIs: bin-level intervals would not be
-# clustered by district. Inference is in tab:chain.
+# Outcomes are residualised on the full control set plus the
+# non-priority part (as in the primary split models) and shown relative
+# to the sample average, on a SHARED y-axis. No CIs: bin-level intervals
+# would not be clustered by district. Inference is in tab:mechanism.
 
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
@@ -24,14 +22,10 @@ if (!exists("theme_paper")) {   # same theme as 07_figures_maps.R
           panel.grid.major.y = element_line(colour = "grey90", linewidth = 0.3))
 }
 
-
-# binscatter  ------------------------------------------------------------
-
-
 bin_outcomes <- c(
-  hdds_own   = "Own-produced food groups",
-  hdds_purch = "Purchased food groups",
-  hdds       = "Dietary diversity (HDDS)"
+  hdds_own       = "Own-produced food groups",
+  hdds_purch     = "Purchased food groups",
+  hdds_nonstaple = "Non-staple food groups"
 )
 
 # Median LUC across the 30 districts, not across households
@@ -43,7 +37,7 @@ luc_med <- primary %>%
 # Residuals have mean zero, so y reads as food groups relative to
 # the average household with the same controls
 for (y in names(bin_outcomes)) {
-  fit <- lm(reformulate(CONTROLS, response = y), data = primary,
+  fit <- lm(reformulate(c(CONTROLS, "hhi_nonprio_c"), response = y), data = primary,
             na.action = na.exclude)
   primary[[paste0(y, "_adj")]] <- as.numeric(resid(fit))
 }
@@ -53,14 +47,14 @@ bin_data <- primary %>%
     luc_group = factor(if_else(luc_intensity > luc_med,
                                "High-LUC districts", "Low-LUC districts"),
                        levels = c("Low-LUC districts", "High-LUC districts")),
-    hhi_bin = ntile(crop_hhi, 5)   # quintiles on the full sample
+    hhi_bin = ntile(hhi_prio, 5)   # quintiles on the full sample
   ) %>%
   pivot_longer(all_of(paste0(names(bin_outcomes), "_adj")),
                names_to = "outcome", values_to = "value") %>%
   mutate(outcome = factor(bin_outcomes[sub("_adj$", "", outcome)],
                           levels = bin_outcomes)) %>%
   group_by(luc_group, outcome, hhi_bin) %>%
-  summarise(hhi = mean(crop_hhi), value = mean(value, na.rm = TRUE),
+  summarise(hhi = mean(hhi_prio), value = mean(value, na.rm = TRUE),
             n = n(), .groups = "drop")
 
 cat("Households per bin (min / max):", min(bin_data$n), "/", max(bin_data$n), "\n")
@@ -70,7 +64,7 @@ p_bins <- ggplot(bin_data, aes(hhi, value, linetype = outcome)) +
   geom_line(linewidth = 0.7) +
   scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = NULL) +
   facet_wrap(~ luc_group) +
-  labs(x = "Crop concentration (HHI), quintile means",
+  labs(x = "Priority-crop concentration (priority part of HHI), quintile means",
        y = "Food groups relative to average\n(adjusted for controls)") +
   theme_paper +
   theme(legend.key.width = unit(1.5, "cm"))
@@ -137,11 +131,11 @@ grp <- items %>%
   group_by(hhid, group) %>%
   summarise(consumed  = any(consumed),
             own       = any(own & consumed),   # as hdds_own
-            purchased = any(purchased),        # as hdds_purch
+            purchased = any(purchased & consumed),   # as hdds_purch
             .groups = "drop")
 
 n_hh <- n_distinct(grp$hhid)
-cat("Households in food group table:", n_hh, "\n")   # should be 3697
+cat("Households in food group table:", n_hh, "\n")   # should be 3715
 
 fg_tab <- grp %>%
   group_by(group) %>%

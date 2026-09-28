@@ -1,17 +1,14 @@
-
 # 07_figures_maps.R ----------------
 # Figures for the paper (greyscale-safe, serif).
 #
 #   Map 1    : district LUC intensity
-#   Figure 1 : the mechanism chain. HHI effect (per one-SD increase)
-#              on each outcome, in low- vs high-LUC districts
+#   Figure 1 : the mechanism chain. Priority-crop concentration effect
+#              (per one-SD increase) on each outcome, low- vs high-LUC districts
 
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
 dist_luc   <- readRDS(file.path(processed_path, "dist_luc.rds"))
 rwa_map    <- readRDS(file.path(processed_path, "rwa_map.rds"))
-diet       <- readRDS(file.path(processed_path, "diet_models.rds"))
-food_value <- readRDS(file.path(processed_path, "primary_models.rds"))
 
 theme_paper <- theme_classic(base_size = 12, base_family = "serif") +
   theme(legend.position = "bottom",
@@ -43,28 +40,29 @@ ggsave(file.path(output_figures_path, "map_luc_intensity.png"), p_map,
 
 
 # mechanism chain ---------------------------------------------------------
+# Figure 3: association between a one-SD increase in PRIORITY-crop
+# concentration and each outcome, in low- (p10) and high-LUC (p90)
+# districts. CR2 with Satterthwaite df (slope_at_split in 00_setup).
 
-
+split <- readRDS(file.path(processed_path, "split_models.rds"))
 
 chain_order <- c(
-  "Own-produced groups"      = "1. Own-produced food groups",
-  "Purchased share of items" = "2. Purchased share (pp)",
-  "Purchased groups"         = "3. Purchased food groups",
-  "Dietary diversity (HDDS)" = "4. Dietary diversity (HDDS)",
-  "Non-staple groups"        = "4b. Non-staple food groups",
-  "Log food value"           = "5. Food value (%)"
+  "Own-produced groups"  = "1. Own-produced food groups",
+  "Purchased share"      = "2. Purchased share (pp)",
+  "Purchased groups"     = "3. Purchased food groups",
+  "Non-staple groups"    = "4. Non-staple food groups",
+  "Animal-source groups" = "4b. Animal-source food groups",
+  "Log food value"       = "5. Food value (%)"
 )
 
-fig_data <- bind_rows(
-  diet$diet_marginal %>%
-    mutate(across(c(effect_1sd, low_1sd, high_1sd),
-                  ~ if_else(outcome == "Purchased share of items", 100 * .x, .x))),
-  food_value$marginal_effects %>%
-    transmute(outcome = "Log food value", luc_pctile, luc_intensity,
-              effect_1sd = pct_1sd, low_1sd = pct_1sd_low, high_1sd = pct_1sd_high)
-) %>%
-  filter(luc_pctile %in% c("p10", "p90")) %>%
+fig_data <- split$split_marginal %>%
+  filter(part == "Priority", luc_pctile %in% c("p10", "p90"),
+         outcome %in% names(chain_order)) %>%
   mutate(
+    across(c(effect_1sd, low_1sd, high_1sd),
+           ~ case_when(outcome == "Purchased share" ~ 100 * .x,
+                       outcome == "Log food value"  ~ 100 * (exp(.x) - 1),
+                       TRUE ~ .x)),
     outcome  = factor(chain_order[outcome], levels = chain_order),
     district = factor(if_else(luc_pctile == "p10", "Low-LUC district (p10)",
                               "High-LUC district (p90)"),
@@ -78,7 +76,7 @@ p_chain <- ggplot(fig_data, aes(x = district, y = effect_1sd, shape = district))
   scale_shape_manual(values = c(16, 21), name = NULL) +
   facet_wrap(~ outcome, scales = "free_y", nrow = 2) +
   labs(x = NULL,
-       y = "Association with a one-SD increase in crop concentration (95% CI)") +
+       y = "Association with a one-SD increase in\npriority-crop concentration (95% CI)") +
   theme_paper +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
@@ -86,7 +84,3 @@ ggsave(file.path(output_figures_path, "fig1_mechanism_chain.png"), p_chain,
        width = 9, height = 5.5, dpi = 300)
 
 message("Figures saved to ", output_figures_path)
-
-
-
-

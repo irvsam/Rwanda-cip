@@ -1,5 +1,3 @@
-
-
 # Post-processes the modelsummary/kableExtra tables in
 # output_tables_path so they can be \input{} without hand edits
 # (which are lost every time 05/05b rerun):
@@ -15,12 +13,15 @@ if (!exists(".setup_done")) source("scripts/00_setup.R")
 
 # Labels the text already uses; everything else gets tab:<file name>
 LABEL_OVERRIDES <- c(
-  chain_results = "tab:mechanism",
-  robust_hdds   = "tab:robust"
+  main_split                 = "tab:mechanism",
+  robust_split_hdds_nonstaple = "tab:robust",
+  chain_results              = "tab:mechanism_hhi",   # plain-HHI comparison
+  robust_hdds                = "tab:robust_hdds"
 )
 
 # Tighter column spacing for the widest table (default 4pt)
-TABCOLSEP_OVERRIDES <- c(chain_results = "2.5pt")
+TABCOLSEP_OVERRIDES <- c(chain_results = "2.5pt", main_split = "2.5pt",
+                         village_fe_split = "2.5pt")
 
 # Header cell over two lines, split at the space nearest the middle
 stack_cell <- function(cell) {
@@ -74,7 +75,7 @@ tidy_tex <- function(file) {
   
   # ---- small consistency fixes ----
   x <- sub("^\\\\begin\\{table\\}$", "\\\\begin{table}[htbp]", x)
-  x <- gsub("HHI x LUC", "HHI $\\\\times$ LUC", x, fixed = FALSE)
+  x <- gsub(" x LUC", " $\\\\times$ LUC", x, fixed = FALSE)   # HHI, Priority, Non-priority, difference rows
   x <- sub("^Num\\.Obs\\. &", "Observations &", x)
   x <- sub("^R2 &", "$R^2$ &", x)
   

@@ -178,6 +178,7 @@ land <- select(land, -n_land_values)
 check_unique(land, "Step 3 land")
 
 # Step 4: crop concentration, pooled Seasons A and B (AHS Section 3/4) --------------------------
+# Split into a priority-crop part and a non-priority part (primary design).
 # Crop area = plot area x crop proportion (NISR SAS handbook, p. 22).
 # Shares use the SUM of crop areas as the denominator, because
 # proportions can exceed 100% in total where crops harvested in
@@ -230,9 +231,10 @@ build_hhi <- function(crops, seasons) {
     summarise(crop_area = sum(crop_area), .groups = "drop_last") %>%
     mutate(share = crop_area / sum(crop_area)) %>%
     summarise(crop_hhi      = sum(share^2),
+              # the two parts of HHI (they sum to crop_hhi)
+              hhi_prio      = sum((share^2)[crop %in% PRIORITY_CROPS]),
+              hhi_nonprio   = sum((share^2)[!crop %in% PRIORITY_CROPS]),
               n_crops       = n(),
-              hhi_prio    = sum((share^2)[crop %in% PRIORITY_CROPS]),
-              hhi_nonprio = sum((share^2)[!crop %in% PRIORITY_CROPS]),
               prio_share    = sum(crop_area[crop %in% PRIORITY_CROPS]) / sum(crop_area),
               top_crop_prio = as.integer(crop[which.max(crop_area)] %in% PRIORITY_CROPS),
               .groups = "drop")
@@ -240,14 +242,22 @@ build_hhi <- function(crops, seasons) {
 
 hh_crops   <- build_hhi(crops_all, c(SEASON_A_CODE, SEASON_B_CODE))   # primary
 hh_crops_A <- build_hhi(crops_all, SEASON_A_CODE) %>%
-  select(hhid, crop_hhi_A = crop_hhi)                                 # check
+  select(hhid, crop_hhi_A = crop_hhi,
+         hhi_prio_A = hhi_prio, hhi_nonprio_A = hhi_nonprio)          # check
 
 stopifnot(isTRUE(all.equal(hh_crops$crop_hhi,
                            hh_crops$hhi_prio + hh_crops$hhi_nonprio)))
 
+# CHECK: is any plot recorded more than once in the same season?
+# If so, hh_area (and the crop shares) would double count it.
+dup_plots <- plots %>% count(hhid, season, plot) %>% filter(n > 1)
+cat("Plot-season combinations recorded more than once in s34:", nrow(dup_plots),
+    "(households:", n_distinct(dup_plots$hhid), ")\n")
+
+# one area per plot and season (was row_id, which cannot catch duplicates)
 hh_area <- crops_all %>%
   filter(season %in% c(SEASON_A_CODE, SEASON_B_CODE)) %>%
-  distinct(hhid, season, row_id, area_sqm) %>%
+  distinct(hhid, season, plot, .keep_all = TRUE) %>%
   group_by(hhid, season) %>%
   summarise(ha = sum(area_sqm) / 10000, .groups = "drop") %>%
   group_by(hhid) %>%
@@ -315,7 +325,7 @@ cat("\nPrimary (AHS) sample:", sum(master$in_ahs), "households\n")
 cat("\nMissing values within the AHS sample:\n")
 master %>%
   filter(in_ahs) %>%
-  summarise(across(c(log_food_ae_real, crop_hhi, crop_hhi_A, prio_share, luc_intensity, log_land,
+  summarise(across(c(log_food_ae_real, crop_hhi, hhi_prio, hhi_nonprio, crop_hhi_A, prio_share, luc_intensity, log_land,
                      hh_size, dep_ratio, head_age, head_female, head_educ,
                      wt_ahs), ~ sum(is.na(.x)))) %>%
   pivot_longer(everything(), names_to = "variable", values_to = "n_missing") %>%
@@ -323,6 +333,15 @@ master %>%
 
 cat("\nLargest single-season area above land held (should be rare):",
     sum(master$area_max_season_ha > master$land_ha * 1.05, na.rm = TRUE), "\n")
+
+# How far above? Many small gaps suggests rented/borrowed land missing from
+# total_agr_land; a few huge ones suggests recording errors
+master %>%
+  filter(in_ahs, area_max_season_ha > land_ha * 1.05) %>%
+  mutate(ratio = area_max_season_ha / pmax(land_ha, 0.001)) %>%
+  summarise(n = n(), median_ratio = median(ratio),
+            p90_ratio = quantile(ratio, 0.9), max_ratio = max(ratio)) %>%
+  print()
 
 cat("Correlation, nominal vs real log food per ae:",
     round(cor(master$log_food_ae_nominal, master$log_food_ae_real,

@@ -130,6 +130,11 @@ diet <- select(diet, -any_answered)
 stopifnot(!any(duplicated(diet$hhid)))
 cat("\nDiet measures built for", nrow(diet), "households\n")
 
+# CHECK: hdds_purch does not require the item to be consumed, hdds does.
+# If this is above 0, purchased-but-not-eaten items inflate hdds_purch.
+cat("Households with more purchased groups than groups consumed:",
+    sum(diet$hdds_purch > diet$hdds, na.rm = TRUE), "\n")
+
 # ---- Household x food group flags (for the per-group models) ----
 hh_groups <- items %>%
   filter(consumed) %>%
