@@ -108,7 +108,7 @@ diet <- items %>%
   group_by(hhid) %>%
   summarise(
     hdds           = n_distinct(group[consumed]),
-    hdds_purch     = n_distinct(group[purchased]),
+    hdds_purch     = n_distinct(group[purchased & consumed]),
     hdds_own       = n_distinct(group[own & consumed]),
     hdds_nonstaple = n_distinct(group[consumed & group %in% NONSTAPLE_GROUPS]),
     hdds_asf       = n_distinct(group[consumed & group %in% ASF_GROUPS]),
