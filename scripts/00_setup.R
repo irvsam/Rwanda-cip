@@ -178,6 +178,35 @@ slope_at_split <- function(outcome, data, controls = CONTROLS) {
     })
 }
 
+# Marginal effect of each part of HHI across the whole range of district
+# LUC, per one-SD increase in that part, with 95% CIs (CR2, Satterthwaite
+# df for every point). Used for the marginal effect curve figure.
+slope_curve_split <- function(outcome, data, controls = CONTROLS, n_grid = 100) {
+  d   <- data %>% filter(!is.na(.data[[outcome]]))
+  fit <- lm(make_f_split(outcome, controls), data = d)
+  V   <- vcovCR(fit, cluster = d$district_code, type = "CR2")
+  b   <- coef(fit)
+  luc_range <- range(d$luc_intensity)
+  grid <- seq(luc_range[1], luc_range[2], length.out = n_grid)
+  L    <- grid - mean(d$luc_intensity)
+  
+  parts <- c(Priority = "hhi_prio", `Non-priority` = "hhi_nonprio")
+  
+  imap_dfr(parts, function(raw, part) {
+    C <- matrix(0, nrow = n_grid, ncol = length(b), dimnames = list(NULL, names(b)))
+    C[, paste0(raw, "_c")]       <- 1
+    C[, paste0(raw, "_c:luc_c")] <- L
+    lc <- as.data.frame(linear_contrast(fit, vcov = V, contrasts = C,
+                                        test = "Satterthwaite"))
+    sd_part <- sd(d[[raw]])
+    tibble(outcome = outcome, part = part, luc_intensity = grid,
+           effect_1sd = lc$Est * sd_part,
+           low_1sd    = lc$CI_L * sd_part,
+           high_1sd   = lc$CI_U * sd_part)
+  })
+}
+
+
 # Plain-HHI version (comparison models in 05 and 05b).
 # NOTE: CIs use a fixed 29 df, which is too narrow; slope_at_split()
 # above uses Satterthwaite df and is the one used for the paper figures.
