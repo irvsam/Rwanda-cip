@@ -19,9 +19,9 @@ LABEL_OVERRIDES <- c(
   robust_hdds                = "tab:robust_hdds"
 )
 
-# Tighter column spacing for the widest table (default 4pt)
+# Tighter column spacing for the tables that are too wide (otherwise they spill over the page)
 TABCOLSEP_OVERRIDES <- c(chain_results = "2.5pt", main_split = "2.5pt",
-                         village_fe_split = "2.5pt")
+                         village_fe_split = "2.5pt", diff_split = "2pt")
 
 # Header cell over two lines, split at the space nearest the middle
 stack_cell <- function(cell) {

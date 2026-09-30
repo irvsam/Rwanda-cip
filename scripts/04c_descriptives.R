@@ -95,3 +95,17 @@ primary %>%
             share_of_hhi_prio = mean(hhi_prio) / mean(crop_hhi),
             r = cor(hhi_prio, hhi_nonprio)) %>%
   print(width = Inf)
+
+
+
+# Check
+cat("\nValidation: district LUC vs AHS priority-crop measures (Spearman):\n")
+dist_check <- primary %>%
+  group_by(district_code) %>%
+  summarise(luc = first(luc_intensity),
+            prio_share_ahs = mean(prio_share),
+            top_prio_ahs = mean(top_crop_prio))
+cat("  vs priority-crop share of crop area:",
+    round(cor(dist_check$luc, dist_check$prio_share_ahs, method = "spearman"), 2), "\n")
+cat("  vs share with a priority main crop:",
+    round(cor(dist_check$luc, dist_check$top_prio_ahs, method = "spearman"), 2), "\n")

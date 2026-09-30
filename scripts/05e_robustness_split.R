@@ -17,13 +17,18 @@ robust_outcomes <- c(
   hdds_purch     = "Purchased groups"
 )
 
+
+top_district <- primary %>% slice_max(luc_intensity, n = 1) %>%
+  pull(district_code) %>% unique()
+
 # ---- OLS checks -----------------------------------------------
 split_robust <- imap(robust_outcomes, function(label, y) {
   list(
     "Primary"        = fit_cl(make_f_split(y), primary),
     "AHS weights"    = fit_cl(make_f_split(y), primary, weights = wt_ahs),
     "Season A only"  = fit_cl(make_f_split(y), primary_A),
-    "Excl. HDDS = 0" = fit_cl(make_f_split(y), filter(primary, hdds > 0))
+    "Excl. HDDS = 0" = fit_cl(make_f_split(y), filter(primary, hdds > 0)),
+    "Excl. top-LUC district" = fit_cl(make_f_split(y), filter(primary, district_code != top_district))
   )
 })
 
@@ -64,7 +69,9 @@ walk2(split_vfe, names(split_vfe), function(m, nm) {
 # ---- Tables ---------------------------------------------------
 robust_notes <- paste(SPLIT_NOTES,
                       "Food groups counted over the four EICV7 consumption visits.",
-                      "Season A only: both parts of HHI and LUC intensity measured in Season A.")
+                      "Season A only: both parts of HHI and LUC intensity measured in Season A.",
+                      "Excl. top-LUC district: drops the district with the highest LUC intensity")
+
 
 iwalk(split_robust, function(models, y) {
   modelsummary(

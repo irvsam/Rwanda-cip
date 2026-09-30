@@ -5,29 +5,29 @@
 \footnotesize
 \setlength{\tabcolsep}{4pt}
 \centering
-\begin{tabular}[t]{lcccc}
+\begin{tabular}[t]{lccccc}
 \toprule
-   & Primary & \begin{tabular}[c]{@{}c@{}}AHS\\weights\end{tabular} & \begin{tabular}[c]{@{}c@{}}Season\\A only\end{tabular} & \begin{tabular}[c]{@{}c@{}}Excl.\\HDDS = 0\end{tabular}\\
+   & Primary & \begin{tabular}[c]{@{}c@{}}AHS\\weights\end{tabular} & \begin{tabular}[c]{@{}c@{}}Season\\A only\end{tabular} & \begin{tabular}[c]{@{}c@{}}Excl.\\HDDS = 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}Excl. top-LUC\\district\end{tabular}\\
 \midrule
-Priority-crop concentration (centred) & -0.195 & 0.193 & -0.238+ & -0.156\\
- & (0.151) & (0.149) & (0.116) & (0.148)\\
-Non-priority concentration (centred) & -0.022 & 0.162 & -0.233 & 0.003\\
- & (0.231) & (0.229) & (0.175) & (0.227)\\
-District LUC intensity (pp, centred) & 0.020 & 0.014 & 0.016 & 0.020\\
- & (0.015) & (0.016) & (0.015) & (0.015)\\
-Priority $\times$ LUC intensity & -0.111* & -0.167* & -0.058 & -0.117*\\
- & (0.047) & (0.054) & (0.033) & (0.046)\\
-Non-priority $\times$ LUC intensity & -0.108+ & -0.149* & -0.098* & -0.110+\\
- & (0.049) & (0.059) & (0.042) & (0.049)\\
+Priority-crop concentration (centred) & -0.195 & 0.193 & -0.238+ & -0.156 & -0.202\\
+ & (0.151) & (0.149) & (0.116) & (0.148) & (0.153)\\
+Non-priority concentration (centred) & -0.022 & 0.162 & -0.233 & 0.003 & -0.016\\
+ & (0.231) & (0.229) & (0.175) & (0.227) & (0.250)\\
+District LUC intensity (pp, centred) & 0.020 & 0.014 & 0.016 & 0.020 & 0.022\\
+ & (0.015) & (0.016) & (0.015) & (0.015) & (0.020)\\
+Priority $\times$ LUC intensity & -0.111* & -0.167* & -0.058 & -0.117* & -0.112\\
+ & (0.047) & (0.054) & (0.033) & (0.046) & (0.058)\\
+Non-priority $\times$ LUC intensity & -0.108+ & -0.149* & -0.098* & -0.110+ & -0.096\\
+ & (0.049) & (0.059) & (0.042) & (0.049) & (0.073)\\
 \midrule
-Observations & 3715 & 3715 & 3697 & 3710\\
-$R^2$ & 0.144 & 0.153 & 0.143 & 0.145\\
+Observations & 3715 & 3715 & 3697 & 3710 & 3659\\
+$R^2$ & 0.144 & 0.153 & 0.143 & 0.145 & 0.145\\
 \bottomrule
 \end{tabular}
 
 \vspace{0.5em}
 \begin{minipage}{\linewidth}
 \footnotesize
-\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. Crop concentration (HHI, Seasons A and B) is split into the part from CIP priority crops and the part from all other crops; the two sum to the HHI. Both parts and LUC intensity are centred on their sample means. Reference education category: never attended. Food groups counted over the four EICV7 consumption visits. Season A only: both parts of HHI and LUC intensity measured in Season A.
+\textit{Notes:} + p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001. CR2 standard errors clustered by district (30 clusters) in parentheses. All models include province fixed effects, urban/rural, household size, dependency ratio, head age, sex and education, and log land held. Crop concentration (HHI, Seasons A and B) is split into the part from CIP priority crops and the part from all other crops; the two sum to the HHI. Both parts and LUC intensity are centred on their sample means. Reference education category: never attended. Food groups counted over the four EICV7 consumption visits. Season A only: both parts of HHI and LUC intensity measured in Season A. Excl. top-LUC district: drops the district with the highest LUC intensity.
 \end{minipage}
 \end{table}

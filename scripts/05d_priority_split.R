@@ -112,11 +112,20 @@ modelsummary(
   title = "Difference between priority and non-priority concentration",
   output = file.path(output_tables_path, "diff_split.tex")
 )
-
 # Stepwise (appendix)
 modelsummary(
   nonstaple_steps, coef_map = SPLIT_LABELS, gof_map = c("nobs", "r.squared"),
-  stars = TRUE, notes = paste(STEP_NOTES, "Food groups counted over the four EICV7 consumption visits."),
+  stars = TRUE,
+  notes = paste(
+    "CR2 standard errors clustered by district (30 clusters) in parentheses.",
+    "(1) urban/rural and province fixed effects; (2) adds household size, dependency",
+    "ratio and head age, sex and education; (3) adds log land held.",
+    "Crop concentration (HHI, Seasons A and B) is split into the part from CIP priority crops",
+    "and the part from all other crops; the two sum to the HHI.",
+    "Both parts and LUC intensity are centred on their sample means.",
+    "Reference education category: never attended.",
+    "Food groups counted over the four EICV7 consumption visits."
+  ),
   title = "Priority-crop concentration and non-staple food groups, stepwise",
   output = file.path(output_tables_path, "nonstaple_steps.tex")
 )

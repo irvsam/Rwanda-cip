@@ -50,6 +50,23 @@ if (isTRUE(CHECK_LABELS)) {
   print(val_labels(ahs_s2$s2q2a))   # plot land use: what are 96 and 99? 96 = agricultural, 99 = building, 95 = forest
   print(val_labels(ahs_s6$s6q10))   # cooperative membership: which is "yes"? yes = 1
   print(val_labels(ahs_s34$s3_q4_1)) # crop codes: do they match the SAS list (101 maize etc.)?
+  
+  
+  
+  # what does s2q6 distinguish?
+  sas_a %>% count(s2q6 = as_factor(s2q6))
+  
+  # is there a separate land-use variable? list variable labels mentioning use
+  labs <- sapply(sas_a, function(x) attr(x, "label"))
+  labs[grepl("use|crop|fallow|pasture", labs, ignore.case = TRUE)]
+  
+  # is the LUC question only asked for some plots?
+  sas_a %>%
+    mutate(luc_answered = !is.na(s2q12)) %>%
+    count(s2q6 = as_factor(s2q6), luc_answered)
+  
 }
+
+
 
 message("AHS loaded")

@@ -10,6 +10,9 @@ if (!exists(".setup_done")) source("scripts/00_setup.R")
 dist_luc   <- readRDS(file.path(processed_path, "dist_luc.rds"))
 rwa_map    <- readRDS(file.path(processed_path, "rwa_map.rds"))
 
+master  <- readRDS(file.path(processed_path, "master.rds"))
+primary <- make_primary(master)
+
 theme_paper <- theme_classic(base_size = 12, base_family = "serif") +
   theme(legend.position = "bottom",
         strip.background = element_blank(),
@@ -85,21 +88,22 @@ ggsave(file.path(output_figures_path, "fig1_mechanism_chain.png"), p_chain,
 
 
 # marginal effect curves ---------------------------------------------------
-# Figure: effect of a one-SD increase in PRIORITY-crop concentration
-# across the full range of district LUC intensity, with 95% CIs (grey
-# band). Tick marks along the bottom show where the 30 districts lie, so
-# the reader can see how much data sits behind each part of the curve.
+# Effect of a one-SD increase in PRIORITY-crop concentration across the
+# full range of district LUC intensity, with 95% CIs (grey band). Tick
+# marks along the bottom show where the 30 districts lie.
 
 curve_outcomes <- c(
-  "Own-produced food groups (link 1)" = "hdds_own",
-  "Purchased food groups (link 3)"    = "hdds_purch",
-  "Non-staple food groups"            = "hdds_nonstaple",
-  "Animal-source food groups"         = "hdds_asf"
+  "1. Own-produced food groups" = "hdds_own",
+  "2. Purchased share (pp)"     = "purch_share",
+  "3. Purchased food groups"    = "hdds_purch",
+  "4. Non-staple food groups"   = "hdds_nonstaple"
 )
 
 curve_data <- map_dfr(curve_outcomes, ~ slope_curve_split(.x, primary)) %>%
   filter(part == "Priority") %>%
-  mutate(outcome = factor(names(curve_outcomes)[match(outcome, curve_outcomes)],
+  mutate(across(c(effect_1sd, low_1sd, high_1sd),
+                ~ if_else(outcome == "purch_share", 100 * .x, .x)),
+         outcome = factor(names(curve_outcomes)[match(outcome, curve_outcomes)],
                           levels = names(curve_outcomes)))
 
 district_luc <- primary %>% distinct(district_code, luc_intensity)
@@ -107,16 +111,20 @@ district_luc <- primary %>% distinct(district_code, luc_intensity)
 p_curve <- ggplot(curve_data, aes(luc_intensity, effect_1sd)) +
   geom_ribbon(aes(ymin = low_1sd, ymax = high_1sd), fill = "grey85") +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey40", linewidth = 0.4) +
-  geom_line(linewidth = 0.7) +
+  geom_line(linewidth = 0.8) +
   geom_rug(data = district_luc, aes(x = luc_intensity), inherit.aes = FALSE,
-           sides = "b", length = unit(0.02, "npc"), colour = "grey30") +
+           sides = "b", length = unit(0.025, "npc"), colour = "grey35", linewidth = 0.4) +
   facet_wrap(~ outcome, scales = "free_y", nrow = 2) +
-  labs(x = "District LUC intensity (% of agricultural land under consolidation)",
-       y = "Change per one-SD increase in\npriority-crop concentration (95% CI)") +
-  theme_paper
+  scale_x_continuous(breaks = seq(0, 12, 3), expand = expansion(mult = c(0.02, 0.02))) +
+  labs(x = "District LUC intensity (% of cultivated land under consolidation)",
+       y = "Effect of a one-SD increase in priority-crop concentration (95% CI)") +
+  theme_paper +
+  theme(strip.text = element_text(size = 11, hjust = 0),
+        panel.spacing = unit(1.2, "lines"),
+        axis.title.y = element_text(margin = margin(r = 8)),
+        axis.title.x = element_text(margin = margin(t = 8)))
 
 ggsave(file.path(output_figures_path, "fig_marginal_curve.png"), p_curve,
-       width = 8, height = 6, dpi = 300)
-
+       width = 8, height = 6.5, dpi = 300)
 
 message("Figures saved to ", output_figures_path)

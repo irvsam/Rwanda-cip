@@ -252,8 +252,8 @@ SPLIT_LABELS <- c(
 )
 
 DIFF_LABELS <- c(
-  "hhi_prio_c"       = "Priority minus non-priority slope",
-  "hhi_prio_c:luc_c" = "Priority minus non-priority, x LUC intensity"
+  "hhi_prio_c"       = "Difference in slopes",
+  "hhi_prio_c:luc_c" = "Difference x LUC intensity"
 )
 
 ALL_LABELS <- c(
