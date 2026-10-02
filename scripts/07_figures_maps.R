@@ -117,7 +117,7 @@ p_curve <- ggplot(curve_data, aes(luc_intensity, effect_1sd)) +
   facet_wrap(~ outcome, scales = "free_y", nrow = 2) +
   scale_x_continuous(breaks = seq(0, 12, 3), expand = expansion(mult = c(0.02, 0.02))) +
   labs(x = "District LUC intensity (% of cultivated land under consolidation)",
-       y = "Effect of a one-SD increase in priority-crop concentration (95% CI)") +
+       y = "Association with a one-SD increase in priority-crop concentration (95% CI)") +
   theme_paper +
   theme(strip.text = element_text(size = 11, hjust = 0),
         panel.spacing = unit(1.2, "lines"),

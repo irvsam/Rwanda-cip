@@ -17,7 +17,7 @@ desc_vars <- primary %>%
     `Dietary diversity (HDDS, 0-12)`                  = hdds,
     `Non-staple food groups (0-6)`                    = hdds_nonstaple,
     `Animal-source food groups (0-4)`                 = hdds_asf,
-    `Food consumption per AE, Jan 2024 prices (RWF)`  = food_ae_real,
+    `Food consumption per AE, Jan 2024 prices (thousand RWF)` = food_ae_real / 1000,
     # Explanatory variables
     `Crop concentration (HHI, Seasons A and B)`       = crop_hhi,
     `HHI: priority-crop part`                        = hhi_prio,
@@ -41,9 +41,11 @@ print(summary(desc_vars))
 
 datasummary(All(desc_vars) ~ Mean + SD + Min + Median + Max, data = desc_vars, fmt = 2,
             title = "Descriptive statistics, AHS sample",
+           
             output = file.path(output_tables_path, "table1_descriptives.tex"))
 datasummary_skim(desc_vars, type = "categorical",
                  title = "Categorical variables, AHS sample",
+                 
                  output = file.path(output_tables_path, "table1_descriptives_categorical.tex"))
 
 # ---- Checks cited in the design section ---------------------

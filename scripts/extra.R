@@ -149,6 +149,8 @@ fg_tab <- grp %>%
 print(fg_tab)
 
 # ---- Step 4: LaTeX (needs booktabs and tabularx) -----------------
+SOURCE_NOTE <- paste("\\textit{Source:} Author's calculations based on NISR EICV7 (2023/24),",
+                     "AHS 2024 and SAS 2024.")
 rows <- sprintf("%s & %s & %s & %.0f & %.0f & %.0f \\\\",
                 fg_tab$group, fg_tab$nonstaple, fg_tab$examples,
                 fg_tab$consumed, fg_tab$own, fg_tab$purchased)
@@ -176,14 +178,18 @@ tex <- c(
   "\\footnotesize",
   paste0(
     "\\textit{Notes:} Groups follow the 12-group HDDS ",
-    "\\parencite{swindaleHouseholdDietaryDiversity2006}. ",
+    "\\parencite{swindaleHouseholdDietaryDiversity}. ",
     "Shares are for the primary sample (n = ", format(n_hh, big.mark = "{,}"),
     "): any item in the group over the four EICV7 recall visits. ",
     "Classification decisions: fresh beans and dry peas as legumes; ",
     "string beans and fresh peas as vegetables; cooking banana as a root/tuber; ",
     "butter as oils and fats; ice cream as dairy; \\textit{ubushera}, beer bananas and fruit juices as beverages. ",
-    "Baby food, other food items and mineral water are excluded."
+    "Baby food, other food items and mineral water are excluded. ",
+    "HDDS: Household Dietary Diversity Score."
   ),
+  "",
+  "\\vspace{0.3em}",
+  SOURCE_NOTE,
   "\\end{minipage}",
   "\\end{table}"
 )

@@ -6,7 +6,10 @@
 #     table wider than the page) into a minipage below it
 #   - two-line column headers so wide tables fit the page
 #   - footnotesize, [htbp], "HHI $\times$ LUC", Observations, $R^2$
-# Safe to rerun: files that already have a \\label{} are skipped.
+#   - defines the abbreviations each table uses and adds a source
+#     line, so every table can be read on its own
+# Safe to rerun: files that already have a \\label{} are skipped, so
+# rerun the scripts that write the tables (05 to 05e) before this one.
 
 
 if (!exists(".setup_done")) source("scripts/00_setup.R")
@@ -17,6 +20,17 @@ LABEL_OVERRIDES <- c(
   robust_split_hdds_nonstaple = "tab:robust",
   chain_results              = "tab:mechanism_hhi",   # plain-HHI comparison
   robust_hdds                = "tab:robust_hdds"
+)
+
+# Source line and abbreviations added below every model table
+SOURCE_NOTE <- paste("\\textit{Source:} Author's calculations based on NISR EICV7 (2023/24),",
+                     "AHS 2024 and SAS 2024.")
+# Extra notes for tables that have none of their own
+EXTRA_NOTES <- c(
+  table1_descriptives = paste("Primary estimation sample of farming households (n = 3,715), unweighted.",
+                              "Food groups counted over the four EICV7 consumption visits; crop measures",
+                              "from AHS 2024 (Seasons A and B); LUC intensity is the share of district",
+                              "cultivated land under LUC in SAS 2024.")
 )
 
 # Tighter column spacing for the tables that are too wide (otherwise they spill over the page)
@@ -53,17 +67,19 @@ tidy_tex <- function(file) {
   }
   
   # ---- notes: \multicolumn{n}{l}{\rule{0pt}{1em}TEXT}\\ -> minipage ----
+  # Abbreviations and the source line are added to every captioned table
   note_pat <- "^\\\\multicolumn\\{[0-9]+\\}\\{l\\}\\{\\\\rule\\{0pt\\}\\{1em\\}(.*)\\}\\\\\\\\\\s*$"
   is_note  <- grepl(note_pat, x)
-  if (any(is_note)) {
-    notes <- sub(note_pat, "\\1", x[is_note])
-    x     <- x[!is_note]
-    note_text <- paste0("\\textit{Notes:} ", paste(sub("\\.?\\s*$", ".", notes), collapse = " "))
-    end_tab <- max(grep("^\\\\end\\{tabular\\}", x))
-    x <- append(x, c("", "\\vspace{0.5em}", "\\begin{minipage}{\\linewidth}",
-                     "\\footnotesize", note_text, "\\end{minipage}"), after = end_tab)
-  }
-  
+  notes    <- sub(note_pat, "\\1", x[is_note])
+  if (name %in% names(EXTRA_NOTES)) notes <- c(notes, EXTRA_NOTES[[name]])
+  x        <- x[!is_note]
+  notes    <- sub("\\.?\\s*$", ".", notes)
+  note_lines <- if (length(notes) > 0)
+    paste0("\\textit{Notes:} ", paste(notes, collapse = " ")) else character(0)
+  if (!any(grepl("Source:", x))) note_lines <- c(note_lines, "", SOURCE_NOTE)
+  end_tab <- max(grep("^\\\\end\\{tabular", x))
+  x <- append(x, c("", "\\vspace{0.5em}", "\\begin{minipage}{\\linewidth}",
+                   "\\footnotesize", note_lines, "\\end{minipage}"), after = end_tab)
   # ---- column headers over two lines (row after \toprule) ----
   top <- grep("^\\\\toprule", x)[1]
   if (!is.na(top) && !grepl("begin\\{tabular\\}\\[c\\]", x[top + 1])) {
@@ -78,6 +94,11 @@ tidy_tex <- function(file) {
   x <- gsub(" x LUC", " $\\\\times$ LUC", x, fixed = FALSE)   # HHI, Priority, Non-priority, difference rows
   x <- sub("^Num\\.Obs\\. &", "Observations &", x)
   x <- sub("^R2 &", "$R^2$ &", x)
+  if (name == "village_fe_split") {
+    x <- sub("^Priority-crop concentration \\(centred\\)", "Priority HHI", x)
+    x <- sub("^Non-priority concentration \\(centred\\)", "Non-priority HHI", x)
+    x <- gsub(" LUC intensity &", " LUC &", x)
+  }
   
   writeLines(x, file)
   message("Tidied: ", basename(file))
